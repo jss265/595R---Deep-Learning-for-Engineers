@@ -4,17 +4,23 @@ from torch.utils.data import TensorDataset, DataLoader, random_split
 import matplotlib.pyplot as plt
 import numpy as np
 
-class VanillaNetwork(nn.Module):
+class VanillaNetwork(nn.Module): 
     
     def __init__(self):
         super().__init__()
 
+        size1 = 20
+        size2 = 20
+        size3 = 20
+        
         self.network = nn.Sequential(
-            nn.Linear(7, 24),
+            nn.Linear(7, size1),
             nn.ReLU(),
-            nn.Linear(24, 36),
+            nn.Linear(size1, size2),
             nn.ReLU(),
-            nn.Linear(36, 1),
+            nn.Linear(size2, size3),
+            nn.ReLU(),
+            nn.Linear(size3, 1),
         )
 
     def forward(self, x):
@@ -76,6 +82,20 @@ def loaddata(batch_size):
     features = torch.tensor(data[:, 1:], dtype=torch.float32)
     targets = torch.tensor(data[:, :1].reshape(-1, 1), dtype=torch.float32)
 
+    # normalization: x_hat = (x - u) / sigma
+    for i in range(features.shape[1]):
+        u = features[:, i].mean().item()
+        sigma = features[:, i].std().item()
+        features[:, i] -= u
+        features[:, i] /= sigma
+
+    for i in range(targets.shape[1]):
+        u = targets[:, i].mean().item()
+        sigma = targets[:, i].std().item()
+        targets[:, i] -= u
+        targets[:, i] /= sigma
+    # -------------
+
     dataset = TensorDataset(features, targets)
 
     train_ds, test_ds = random_split(dataset, [0.8, 0.2])
@@ -111,6 +131,16 @@ if __name__ == '__main__':
     plt.plot(range(epochs), train_losses)
     plt.plot(range(epochs), test_losses)
     plt.legend(['train', 'test'])
+
+    # save pic
+    import os
+
+    existing_files = os.listdir('screenshots')
+    if not existing_files:
+        next_num = 1
+    else:
+        numbers = [int(file_name[:-4]) for file_name in existing_files]
+        next_num = np.max(numbers) + 1
+    plt.savefig(f'screenshots/{next_num}', dpi=300, bbox_inches="tight")
+    print(f'Saved figure as {next_num}.png')
     plt.show()
-
-
