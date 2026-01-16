@@ -1,0 +1,22 @@
+class VanillaNetwork(nn.Module):
+    
+    def __init__(self):
+        super().__init__()
+
+        size1 = 20
+        size2 = 20
+        size3 = 20
+        
+        # two hidden layers
+        self.network = nn.Sequential(
+            nn.Linear(7, size1),
+            nn.ReLU(),
+            nn.Linear(size1, size2),
+            nn.ReLU(),
+            nn.Linear(size2, size3),
+            nn.ReLU(),
+            nn.Linear(size3, 1),
+        )
+
+    def forward(self, x):
+        return self.network(x)
