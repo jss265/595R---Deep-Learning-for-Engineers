@@ -9,9 +9,9 @@ class VanillaNetwork(nn.Module):
     def __init__(self):
         super().__init__()
 
-        size1 = 3
-        size2 = 3
-        size3 = 3
+        size1 = 5
+        size2 = 5
+        size3 = 5
         
         # two hidden layers
         self.network = nn.Sequential(
@@ -110,7 +110,7 @@ def loaddata(batch_size):
     return train_dataloader, test_dataloader, u_target, sigma_target
 
 if __name__ == '__main__':
-    for i in range(10):
+    for i in range(5):
         model = VanillaNetwork()
         loss_fn = nn.MSELoss() # objective
         loss_fn_MAE = nn.L1Loss() # MAE loss
@@ -134,9 +134,9 @@ if __name__ == '__main__':
 
         # create MSE error figure
         plt.figure()
-        plt.title('Test/Training MSE Error Tracking (Normalized)')
+        plt.title('Objective')
         plt.xlabel('Epoch')
-        plt.ylabel('Mean Squared Error')
+        plt.ylabel('Normalized Mean Squared Error')
         plt.plot(range(epochs), train_losses)
         plt.plot(range(epochs), test_losses)
         plt.yscale('log')
