@@ -1,7 +1,5 @@
 ###
 # This file is a list of helpfule function that will be used in multiple projects.
-# Haven't figured out yet how to import it into python files in other folders.
-# For now just copy and paste.
 ### 
 
 import os
@@ -23,5 +21,5 @@ def savePicInSequence(folder_path):
         numbers = [int(file_name[:-4]) for file_name in existing_files]
         next_num = np.max(numbers) + 1
 
-    plt.savefig(f'{folder_path}\{next_num}', dpi=300, bbox_inches="tight")
+    plt.savefig(os.path.join(folder_path, str(next_num)), dpi=300, bbox_inches="tight")
     print(f'Saved figure as {next_num}.png')
