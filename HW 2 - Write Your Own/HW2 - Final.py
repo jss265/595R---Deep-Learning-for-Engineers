@@ -1,172 +1,161 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ---------------- activations ----------------
-def relu(z):
+# ---------- activations ----------
+def relu(z): 
     return np.maximum(0, z)
 
-def relu_back(xbar, z):
-    return xbar * (z > 0)
+def relu_back(g, z): 
+    return g * (z > 0)
 
-def identity(z):
+def identity(z): 
     return z
 
-def identity_back(xbar, z):
-    return xbar
+def identity_back(g, z): 
+    return g
 
-# ---------------- initialization ----------------
-def initialization(nin, nout):
-    # He initialization (fixes dead ReLU problem)
-    W = np.random.randn(nout, nin) * np.sqrt(2 / nin)
-    b = np.zeros((nout, 1))
-    return W, b
+# ---------- initialization ----------
+def init(nin, nout):
+    return (
+        np.random.randn(nout, nin) * np.sqrt(2 / nin),
+        np.zeros((nout, 1))
+    )
 
-# ---------------- loss ----------------
+# ---------- loss ----------
 def mse(yhat, y):
     return np.mean((yhat - y) ** 2)
 
 def mse_back(yhat, y):
     return 2 * (yhat - y) / y.shape[1]
 
-# ---------------- layer ----------------
+# ---------- layer ----------
 class Layer:
-    def __init__(self, nin, nout, activation=identity):
-        self.W, self.b = initialization(nin, nout)
-        self.activation = activation
-        self.activation_back = relu_back if activation == relu else identity_back
+    def __init__(self, nin, nout, act):
+        self.W, self.b = init(nin, nout)
+        self.act = act
+        self.act_back = relu_back if act == relu else identity_back
 
     def forward(self, X, train=True):
         Z = self.W @ X + self.b
-        Xnew = self.activation(Z)
         if train:
-            self.X = X
-            self.Z = Z
-        return Xnew
+            self.X, self.Z = X, Z
+        return self.act(Z)
 
-    def backward(self, Xbar):
-        Zbar = self.activation_back(Xbar, self.Z)
-        self.Wbar = Zbar @ self.X.T / self.X.shape[1]
-        self.bbar = np.mean(Zbar, axis=1, keepdims=True)
-        return self.W.T @ Zbar
+    def backward(self, g):
+        g = self.act_back(g, self.Z)
+        self.Wg = g @ self.X.T / self.X.shape[1]
+        self.bg = g.mean(axis=1, keepdims=True)
+        return self.W.T @ g
 
-# ---------------- network ----------------
+# ---------- network ----------
 class Network:
-    def __init__(self, layers, loss):
+    def __init__(self, layers):
         self.layers = layers
-        self.loss = loss
-        self.loss_back = mse_back
 
-    def forward(self, X, y, train=True):
-        for layer in self.layers:
-            X = layer.forward(X, train)
-        yhat = X
-        L = self.loss(yhat, y)
-        if train:
-            self.y = y
-            self.yhat = yhat
-        return L, yhat
+    def forward(self, X, y=None, train=True):
+        for l in self.layers:
+            X = l.forward(X, train)
+        return (mse(X, y), X) if y is not None else X
 
-    def backward(self):
-        Xbar = self.loss_back(self.yhat, self.y)
-        for layer in reversed(self.layers):
-            Xbar = layer.backward(Xbar)
+    def backward(self, yhat, y):
+        g = mse_back(yhat, y)
+        for l in reversed(self.layers):
+            g = l.backward(g)
 
-# ---------------- optimizer ----------------
-class GradientDescent:
-    def __init__(self, alpha):
-        self.alpha = alpha
+# ---------- optimizer ----------
+class GD:
+    def __init__(self, lr, wd=0.0):
+        self.lr = lr
+        self.wd = wd
 
-    def step(self, network):
-        for layer in network.layers:
-            layer.W -= self.alpha * layer.Wbar
-            layer.b -= self.alpha * layer.bbar
+    def step(self, net):
+        for l in net.layers:
+            l.W *= (1 - self.lr * self.wd)   # weight decay
+            l.W -= self.lr * l.Wg
+            l.b -= self.lr * l.bg
 
 # ======================================================
 #                      MAIN
 # ======================================================
 if __name__ == "__main__":
 
-    # ---------- data ----------
-    numeric_data = []
-    with open("HW 2 - Write Your Own/auto-mpg.data", "r") as file:
-        for line in file:
-            cols = line.strip().split()
-            if "?" in cols[:8]:
-                continue
-            numeric_data.append([float(v) for v in cols[:8]])
+    # ----- load data -----
+    data = []
+    with open("HW 2 - Write Your Own/auto-mpg.data") as f:
+        for line in f:
+            cols = line.split()
+            if "?" not in cols[:8]:
+                data.append([float(c) for c in cols[:8]])
 
-    data = np.array(numeric_data)
-
+    data = np.array(data)
     np.random.seed(0)
     data = data[np.random.permutation(len(data))]
 
     split = int(0.8 * len(data))
     train, test = data[:split], data[split:]
 
-    Xtrain, ytrain = train[:, 1:], train[:, 0]
-    Xtest, ytest = test[:, 1:], test[:, 0]
+    Xtr, ytr = train[:, 1:], train[:, 0]
+    Xte, yte = test[:, 1:], test[:, 0]
 
-    Xmean, Xstd = Xtrain.mean(axis=0), Xtrain.std(axis=0)
-    ymean, ystd = ytrain.mean(), ytrain.std()
+    Xm, Xs = Xtr.mean(0), Xtr.std(0)
+    ym, ys = ytr.mean(), ytr.std()
 
-    Xtrain = (Xtrain - Xmean) / Xstd
-    Xtest = (Xtest - Xmean) / Xstd
-    ytrain = (ytrain - ymean) / ystd
-    ytest = (ytest - ymean) / ystd
+    Xtr = ((Xtr - Xm) / Xs).T
+    Xte = ((Xte - Xm) / Xs).T
+    ytr = ((ytr - ym) / ys).reshape(1, -1)
+    yte = ((yte - ym) / ys).reshape(1, -1)
 
-    Xtrain = Xtrain.T
-    Xtest = Xtest.T
-    ytrain = ytrain.reshape(1, -1)
-    ytest = ytest.reshape(1, -1)
+    # ----- model -----
+    net = Network([
+        Layer(7, 32, relu),
+        Layer(32, 16, relu),
+        Layer(16, 1, identity)
+    ])
 
-    # ---------- model ----------
-    layers = [
-        Layer(7, 16, relu),
-        Layer(16, 8, relu),
-        Layer(8, 1, identity)
-    ]
+    opt = GD(lr=1e-2, wd=1e-4)
 
-    network = Network(layers, mse)
-    optimizer = GradientDescent(alpha=1e-2)  # ← KEY FIX
+    # ----- training -----
+    epochs = 6000
+    train_loss, test_loss = [], []
 
-    # ---------- training ----------
-    epochs = 4000
-    train_losses = []
-    test_losses = []
+    for e in range(epochs):
+        if e == 3000:
+            opt.lr = 3e-3
 
-    for epoch in range(epochs):
-        Ltrain, _ = network.forward(Xtrain, ytrain, train=True)
-        network.backward()
-        optimizer.step(network)
+        Ltr, yhat = net.forward(Xtr, ytr)
+        net.backward(yhat, ytr)
+        opt.step(net)
 
-        Ltest, _ = network.forward(Xtest, ytest, train=False)
+        Lte, _ = net.forward(Xte, yte, train=False)
 
-        train_losses.append(Ltrain)
-        test_losses.append(Ltest)
+        train_loss.append(Ltr)
+        test_loss.append(Lte)
 
-        if epoch % 200 == 0:
-            print(f"epoch {epoch}: train={Ltrain:.4f}, test={Ltest:.4f}")
+        if e % 200 == 0:
+            print(f"{e}: train={Ltr:.4f}, test={Lte:.4f}")
 
-    # ---------- evaluation ----------
-    _, yhat = network.forward(Xtest, ytest, train=False)
-    yhat = yhat * ystd + ymean
-    ytest = ytest * ystd + ymean
+    # ----- evaluation -----
+    _, yhat = net.forward(Xte, yte, train=False)
+    yhat = yhat * ys + ym
+    yte = yte * ys + ym
 
-    print("avg absolute error (mpg):",
-          np.mean(np.abs(yhat - ytest)))
+    print("Mean absolute error (mpg):",
+          np.mean(np.abs(yhat - yte)))
 
-    # ---------- plots ----------
+    # ----- plots -----
     plt.figure()
-    plt.plot(train_losses, label="train")
-    plt.plot(test_losses, label="test")
+    plt.plot(train_loss, label="Train Loss")
+    plt.plot(test_loss, label="Test Loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("MSE Loss")
+    plt.title("Training and Testing Loss Over Epochs")
     plt.legend()
-    plt.xlabel("epoch")
-    plt.ylabel("loss")
 
     plt.figure()
-    plt.plot(ytest.T, yhat.T, "o")
-    plt.plot([10, 45], [10, 45], "--")
-    plt.xlabel("true mpg")
-    plt.ylabel("predicted mpg")
+    plt.scatter(yte.T, yhat.T, alpha=0.7)
+    plt.plot([10, 45], [10, 45], "r--")
+    plt.xlabel("True MPG")
+    plt.ylabel("Predicted MPG")
+    plt.title("True vs. Predicted MPG on Test Set")
 
     plt.show()
