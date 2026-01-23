@@ -139,7 +139,7 @@ for t in range(epochs):
 plt.figure()
 plt.plot(range(epochs), train_losses)
 plt.xlabel('Epochs')
-plt.yscale('log')
+# plt.yscale('log')
 plt.ylabel('Training Loss')
 
 t_test = torch.linspace(0, 1, 200).reshape(-1, 1)
