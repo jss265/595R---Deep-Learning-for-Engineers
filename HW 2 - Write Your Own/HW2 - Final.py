@@ -149,6 +149,7 @@ if __name__ == "__main__":
     plt.xlabel("Epoch")
     plt.ylabel("MSE Loss")
     plt.title("Training and Testing Loss Over Epochs")
+    plt.yscale('log')
     plt.legend()
 
     plt.figure()
