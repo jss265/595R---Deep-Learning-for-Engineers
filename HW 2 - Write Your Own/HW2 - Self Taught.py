@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 
 # -------- activation functions -------
 def relu(z):
-    # TODO
+    return np.maximum(0, z)
 
-def relu_back(xbar, z):
-    # TODO
+def relu_back(xbar, z):  # the derivative of relu (da/dz) applied to the upstream gradient
+    return xbar * (z > 0)
 
 identity = lambda z: z
 
