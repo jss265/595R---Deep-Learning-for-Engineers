@@ -7,7 +7,7 @@ import numpy as np
 
 def savePicInSequence(figure, folder_path):
     '''
-    Saves the current figure as the highest numbered photo in the folder passed in. 
+    Saves the figure as the highest numbered photo in the folder passed in. 
     That folder will be created if it doesn't already exist.
     NOTE!: This folder should have no other files inside
     '''
