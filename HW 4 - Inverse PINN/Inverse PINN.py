@@ -43,8 +43,8 @@ if __name__ == '__main__':
         model = Inverse_PINN(2, 1, 3, 32)  # (x, t) -> u
 
         # define training points over the entire domain, for the physics loss
-        x = torch.linspace(-1, 1, 10)  # shape (10,)
-        t = torch.linspace(0, 1, 10)  # shape (10,)
+        x = torch.linspace(-1, 1, 20)  # shape (20,)
+        t = torch.linspace(0, 1, 20)  # shape (20,)
         x, t = torch.meshgrid(x, t, indexing='ij')  # shape 30x30 each
         x_train = x.reshape(-1, 1).requires_grad_(True)  # flatten for model input
         t_train = t.reshape(-1, 1).requires_grad_(True)  # flatten for model input
@@ -97,12 +97,12 @@ if __name__ == '__main__':
             # plot the result as training progresses
             if i % 5000 == 0:
                 # Create finer grid for smooth plotting (independent of training grid)
-                x_fine = torch.linspace(-1, 1, 200)
-                t_fine = torch.linspace(0, 1, 200)
+                x_fine = torch.linspace(-1, 1, 100)
+                t_fine = torch.linspace(0, 1, 100)
                 x_fine, t_fine = torch.meshgrid(x_fine, t_fine, indexing='ij')
                 
                 u = model(x_fine.reshape(-1, 1), t_fine.reshape(-1, 1)).detach()
-                u = u.reshape(200, 200)  # reshape back to 2D grid for plotting
+                u = u.reshape(100, 100)  # reshape back to 2D grid for plotting
                 fig = plt.figure()
                 plt.pcolormesh(
                     t_fine.numpy(),
