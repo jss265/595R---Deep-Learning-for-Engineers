@@ -32,7 +32,7 @@ class Inverse_PINN(nn.Module):
         return self.network(inputs)
 
 if __name__ == '__main__':
-    noAttempts = 5
+    noAttempts = 1
     for _ in range(noAttempts):
         data_path = os.path.join(os.path.dirname(__file__), 'burgers.txt')
         data = np.loadtxt(data_path)
@@ -43,8 +43,8 @@ if __name__ == '__main__':
         model = Inverse_PINN(2, 1, 3, 32)  # (x, t) -> u
 
         # define training points over the entire domain, for the physics loss
-        x = torch.linspace(-1, 1, 30)  # shape (30,)
-        t = torch.linspace(0, 1, 30)  # shape (30,)
+        x = torch.linspace(-1, 1, 10)  # shape (10,)
+        t = torch.linspace(0, 1, 10)  # shape (10,)
         x, t = torch.meshgrid(x, t, indexing='ij')  # shape 30x30 each
         x_train = x.reshape(-1, 1).requires_grad_(True)  # flatten for model input
         t_train = t.reshape(-1, 1).requires_grad_(True)  # flatten for model input
@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
             # compute each term of the PINN loss function above
             # using the following hyperparameters:
-            weight1 = 0.1
+            weight1 = 1e-1
 
             # compute physics loss
             u = model(x_train, t_train)
@@ -96,14 +96,20 @@ if __name__ == '__main__':
 
             # plot the result as training progresses
             if i % 5000 == 0:
-                u = model(x_train, t_train).detach()
-                u = u.reshape(30, 30)  # reshape back to 2D grid for plotting
+                # Create finer grid for smooth plotting (independent of training grid)
+                x_fine = torch.linspace(-1, 1, 200)
+                t_fine = torch.linspace(0, 1, 200)
+                x_fine, t_fine = torch.meshgrid(x_fine, t_fine, indexing='ij')
+                
+                u = model(x_fine.reshape(-1, 1), t_fine.reshape(-1, 1)).detach()
+                u = u.reshape(200, 200)  # reshape back to 2D grid for plotting
                 fig = plt.figure()
                 plt.pcolormesh(
-                    t.numpy(),
-                    x.numpy(),
+                    t_fine.numpy(),
+                    x_fine.numpy(),
                     u.numpy(),
-                    shading='auto')
+                    shading='auto',
+                    cmap='rainbow')
                 plt.colorbar(label='u(t,x)')
                 plt.xlabel('t')
                 plt.ylabel('x')
@@ -117,29 +123,30 @@ if __name__ == '__main__':
                 print(f'    Physics  Loss: {loss_phys:.6f}')
                 print(f'    Observed Loss: {loss_obs:.6f}')
 
-    lambda1_vals = [l[0] for l in lambdas]
-    lambda2_vals = [l[1] for l in lambdas]
-    iterations = range(len(lambdas))
+        lambda1_vals = [l[0] for l in lambdas]
+        lambda2_vals = [l[1] for l in lambdas]
+        iterations = range(len(lambdas))
 
-    fig = plt.figure()
-    plt.title(r'$\lambda_1$ and $\lambda_2$')
-    plt.plot(iterations, lambda1_vals, label=r'$\lambda_1$', color='b')
-    plt.plot(iterations, np.abs(lambda2_vals), label=r'$\lambda_2$ (absolut value)', color='r')
-    plt.hlines(1, 0, len(lambdas), colors='b', linestyles='--', label=r'True $\lambda_1$ value')
-    plt.hlines(np.abs(-0.01/np.pi), 0, len(lambdas), colors='r', linestyles='--', label=r'True $\lambda_2$ value (absolut value)')
-    plt.xlabel('Iteration')
-    plt.ylabel('Value')
-    plt.yscale('log')
-    plt.legend()
-    jss.savePicInSequence(fig, 'HW 4 - Inverse PINN/figs')
+        fig = plt.figure()
+        plt.title(r'$\lambda_1$ and $\lambda_2$')
+        plt.plot(iterations, lambda1_vals, label=r'$\lambda_1$', color='b')
+        plt.plot(iterations, np.abs(lambda2_vals), label=r'$\lambda_2$ (absolut value)', color='r')
+        plt.hlines(1, 0, len(lambdas), colors='b', linestyles='--', label=r'True $\lambda_1$ value')
+        plt.hlines(np.abs(-0.01/np.pi), 0, len(lambdas), colors='r', linestyles='--', label=r'True $\lambda_2$ value (absolut value)')
+        plt.xlabel('Iteration')
+        plt.ylabel('Value')
+        plt.yscale('log')
+        plt.legend()
+        jss.savePicInSequence(fig, 'HW 4 - Inverse PINN/figs')
 
-    print(f"\nFinal lambda1: {lambdas[-1][0]:.4f} (true: 1.0000)")
-    print(f"Final lambda2: {lambdas[-1][1]:.6f} (true: {-0.01/np.pi:.6f})")
+        print(f"\nFinal lambda1: {lambdas[-1][0]:.4f} (true: 1.0000)")
+        print(f"Final lambda2: {lambdas[-1][1]:.6f} (true: {-0.01/np.pi:.6f})")
 
-    fig = plt.figure()
-    plt.title('Losses v Epochs')
-    plt.plot(iterations, losses, label='Total Weighted Loss')
-    plt.plot(iterations, losses_phys, label='Physical Losses')
-    plt.plot(iterations, losses_obs, label='Observation Losses')
-    plt.legend()
-    jss.savePicInSequence(fig, 'HW 4 - Inverse PINN/figs')
+        fig = plt.figure()
+        plt.title('Losses v Epochs')
+        plt.plot(iterations, [l.detach().numpy() for l in losses], label='Total Weighted Loss')
+        plt.plot(iterations, [l.detach().numpy() for l in losses_phys], label='Physical Losses')
+        plt.plot(iterations, [l.detach().numpy() for l in losses_obs], label='Observation Losses')
+        plt.legend()
+        plt.yscale('log')
+        jss.savePicInSequence(fig, 'HW 4 - Inverse PINN/figs')
