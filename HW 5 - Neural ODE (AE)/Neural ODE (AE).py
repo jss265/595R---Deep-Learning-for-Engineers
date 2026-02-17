@@ -9,6 +9,7 @@ It is designed to be managed through the Hyper Parameters and Settings section.
 
 import torch
 from torch import nn
+from torchdiffeq import odeint
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -17,6 +18,8 @@ import pandas as pd
 csv_filename = r'HW 5 - Neural ODE (AE)\Normalized Data.csv'
 
 train_size = 20
+ae_sizes = [4, 8, 4, 2]  # (first) num features, AE layers, (last) latent dim
+latent_sizes = [2, 16, 2]  # (first) latent dim, hidden layers, (last) latent dim 
 stage_size = 4
 activation = nn.ReLU
 
@@ -59,6 +62,33 @@ train = monthly[monthly['index'] < train_size]
 test = monthly[monthly['index'] >= train_size]
 
 # ------- Build Neural Network -------
-class Autoencoder(nn.Module):
-    def __init__(self, *args, **kwargs):
-        super(Autoencoder, self).__init__()
+class Encoder(nn.Module):
+    def __init__(self, ae_sizes, activation):
+        super(Encoder, self).__init__()
+
+        layers = []
+        for i in range(len(ae_sizes) - 1):
+            layers.append(nn.Linear(ae_sizes[i], ae_sizes[i+1]))
+            if i < len(ae_sizes) - 2:
+                layers.append(activation())
+        self.encoder = nn.Sequential(*layers)
+        
+    def forward(self, x):
+        return self.encoder(x)
+    
+class NeuralODE(nn.Module):
+    def __init__(self, latent_sizes, activation, ODE_solver):
+        super(NeuralODE, self).__init__()
+
+        layers = []
+        for i in range(len(latent_sizes) - 1):
+            layers.append(nn.Linear(latent_sizes[i], latent_sizes[i+1]))
+            if i < len(latent_sizes) - 2:
+                layers.append(activation())
+        self.network = nn.Sequential(*layers)
+
+    def solveODE(self, t, y):  # output dy/dt
+        return self.network(y)
+
+    def forward(x):
+        return 
