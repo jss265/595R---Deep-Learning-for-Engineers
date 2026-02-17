@@ -142,11 +142,14 @@ while current_end <= X_train.shape[0]:
     tsteps = torch.arange(current_end, dtype=torch.float32)
     prev_loss = float('inf')
     wait = 0
+    losses = []
 
     for epoch in range(max_epochs):
         optimizer.zero_grad()
-        xhat = model(x_stage, tsteps)[-1]
-        loss = loss_fn(xhat, x_stage)
+        xhat = model(x_stage, tsteps)
+        xhat_diag = xhat[torch.arange(len(x_stage)),
+                         torch.arange(len(x_stage))]
+        loss = loss_fn(xhat_diag, x_stage)
         loss.backward()
         optimizer.step()
 
@@ -159,6 +162,7 @@ while current_end <= X_train.shape[0]:
             wait = 0
         
         prev_loss = loss.item()
+        losses.append(prev_loss)
 
     current_end = min(current_end + stage_size, X_train.shape[0])
 
@@ -166,16 +170,23 @@ while current_end <= X_train.shape[0]:
         xhat_stage = model(x_stage, tsteps).detach().numpy()
         x_stage_np = x_stage.detach().numpy()
 
-    fig, axs = plt.subplots(4, 1, figsize=(8, 10), sharex=True)
-    names = ['meantemp', 'humidity', 'wind_speed', 'meanpressure']
+    fig, axs = plt.subplots(5, 1, figsize=(8, 12), sharex=False)
+    names = ['meantemp', 'humidity', 'wind_speed', 'meanpressure', 'Loss']
 
     for i in range(4):
         axs[i].plot(x_stage_np[:, i], label='Actual')
-        axs[i].plot(xhat_stage[:, i], '--', label='Pred')
+        xhat_diag = xhat_stage[np.arange(len(x_stage_np)), 
+                               np.arange(len(x_stage_np))]
+        axs[i].plot(xhat_diag[:, i], '--', label='Pred')
         axs[i].set_ylabel(names[i])
         axs[i].legend()
 
-    axs[-1].set_xlabel('Time (months)')
+    axs[4].plot(range(len(losses)), losses)
+    axs[4].set_ylabel('Loss')
+    axs[4].set_yscale('log')
+    axs[4].set_xlabel('Epoch')
+
+    axs[-2].set_xlabel('Time (months)')  # Since axs[3] is the last feature
     plt.suptitle(f'Stage {current_end}')
     plt.tight_layout()
     plt.show()
