@@ -20,8 +20,12 @@ csv_filename = r'HW 5 - Neural ODE (AE)\Normalized Data.csv'
 train_size = 20
 ae_sizes = [4, 8, 4, 2]  # (first) num features, AE layers, (last) latent dim
 latent_sizes = [2, 16, 2]  # (first) latent dim, hidden layers, (last) latent dim 
-stage_size = 4
 activation = nn.ReLU
+lr = 0.01
+stage_size = 4
+max_epochs = 100
+tol = 1e-4
+patience = 10
 
 # ------- Data Prep -------
 
@@ -77,7 +81,7 @@ class Encoder(nn.Module):
         return self.encoder(x)
     
 class NeuralODE(nn.Module):
-    def __init__(self, latent_sizes, activation, ODE_solver):
+    def __init__(self, latent_sizes, activation):
         super(NeuralODE, self).__init__()
 
         layers = []
@@ -90,5 +94,90 @@ class NeuralODE(nn.Module):
     def solveODE(self, t, y):  # output dy/dt
         return self.network(y)
 
-    def forward(x):
-        return 
+    def forward(self, y0, tsteps):
+        return odeint(self.solveODE, y0, tsteps)  # should we assert size?
+    
+class Decoder(nn.Module):
+    def __init__(self, ae_sizes, activation):
+        super(Decoder, self).__init__()
+
+        layers = []
+        for i in range(len(ae_sizes) - 1, 0, -1):
+            layers.append(nn.Linear(ae_sizes[i], ae_sizes[i-1]))
+            if i > 1:
+                layers.append(activation())
+
+        self.decoder = nn.Sequential(*layers)
+
+    def forward(self, x):
+        return self.decoder(x)
+    
+class NeuralODEAutoencoder(nn.Module):
+    def __init__(self, ae_sizes, latent_sizes, activation):
+        super(NeuralODEAutoencoder, self).__init__()
+
+        self.encoder = Encoder(ae_sizes, activation)
+        self.ode = NeuralODE(latent_sizes, activation)
+        self.decoder = Decoder(ae_sizes, activation)
+
+    def forward(self, x, tsteps):
+        z0 = self.encoder(x)
+        zt = self.ode(z0, tsteps)
+        xhat = self.decoder(zt)
+        return xhat
+
+# ------- Prepare for Training -------
+features = ['meantemp', 'humidity', 'wind_speed', 'meanpressure']
+X_train = torch.tensor(train[features].values, dtype=torch.float32)
+X_test = torch.tensor(test[features].values, dtype=torch.float32)
+
+model = NeuralODEAutoencoder(ae_sizes, latent_sizes, activation)
+optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+loss_fn = nn.MSELoss()
+
+# ------- Train -------
+current_end = stage_size
+while current_end <= X_train.shape[0]:
+    x_stage = X_train[:current_end]
+    tsteps = torch.arange(current_end, dtype=torch.float32)
+    prev_loss = float('inf')
+    wait = 0
+
+    for epoch in range(max_epochs):
+        optimizer.zero_grad()
+        xhat = model(x_stage, tsteps)[-1]
+        loss = loss_fn(xhat, x_stage)
+        loss.backward()
+        optimizer.step()
+
+        if prev_loss - loss.item() < tol:
+            wait += 1
+            if wait >= patience:
+                print(f'Converged at epoch {epoch}')
+                break
+        else:
+            wait = 0
+        
+        prev_loss = loss.item()
+
+    current_end = min(current_end + stage_size, X_train.shape[0])
+
+    with torch.no_grad():
+        xhat_stage = model(x_stage, tsteps).detach().numpy()
+        x_stage_np = x_stage.detach().numpy()
+
+    fig, axs = plt.subplots(4, 1, figsize=(8, 10), sharex=True)
+    names = ['meantemp', 'humidity', 'wind_speed', 'meanpressure']
+
+    for i in range(4):
+        axs[i].plot(x_stage_np[:, i], label='Actual')
+        axs[i].plot(xhat_stage[:, i], '--', label='Pred')
+        axs[i].set_ylabel(names[i])
+        axs[i].legend()
+
+    axs[-1].set_xlabel('Time (months)')
+    plt.suptitle(f'Stage {current_end}')
+    plt.tight_layout()
+    plt.show()
+
+
