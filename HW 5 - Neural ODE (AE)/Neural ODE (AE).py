@@ -27,8 +27,8 @@ ae_sizes = [4, 8, 2]  # (first) num features, AE layers, (last) latent dim
 latent_sizes = [2, 16, 2]  # (first) latent dim, hidden layers, (last) latent dim 
 activation = nn.ELU
 lr = 0.001
-stage_size = 3
-max_epochs = 500
+stage_size = 1
+max_epochs = 50
 tol = 1e-4
 patience = 20
 
@@ -145,11 +145,13 @@ loss_fn = nn.MSELoss()
 
 # ------- Train -------
 current_end = stage_size
+all_losses = []
 while current_end <= X_train.shape[0]:
     x_stage = X_train[:current_end]
     tsteps = torch.arange(current_end, dtype=torch.float32) / float(current_end)
-    prev_loss = float('inf')
     losses = []
+    best_loss = float('inf')
+    epochs_without_improvement = 0
 
     for epoch in range(max_epochs):
         optimizer.zero_grad()
@@ -160,12 +162,21 @@ while current_end <= X_train.shape[0]:
         loss.backward()
         optimizer.step()
 
-        losses.append(loss.item())
-        if loss.item() < tol:
+        loss_value = loss.item()
+        losses.append(loss_value)
+        all_losses.append(loss_value)
+        if loss_value < tol:
             print(f'Converged at epoch {epoch}')
             break
         
-        prev_loss = loss.item()
+        if loss_value < best_loss:
+            best_loss = loss_value
+            epochs_without_improvement = 0
+        else:
+            epochs_without_improvement += 1
+            if epochs_without_improvement >= patience:
+                print(f'Early stopping at epoch {epoch}, no improvement for {patience} epochs')
+                break
 
     with torch.no_grad():
         tsteps_full = torch.arange(len(X_all), dtype=torch.float32) / float(current_end)
@@ -186,7 +197,7 @@ while current_end <= X_train.shape[0]:
         axs[i].set_ylim([m - 4*s, m + 4*s])
         axs[i].legend()
 
-    axs[4].plot(range(len(losses)), losses)
+    axs[4].plot(range(len(all_losses)), all_losses)
     axs[4].set_ylabel('Loss')
     axs[4].set_yscale('log')
     axs[4].set_xlabel('Epoch')

@@ -1,0 +1,63 @@
+IN THE FUTURE: It would be nice for figures to report code version (somehow logged in GitHub) as well as report hyperparameters used in a small textbox
+
+183 
+    The first promising result - run with custom SWIFT activation
+197 
+    Very good - run with nn.ELU
+204 
+    TURNED IN FOR GRADE - run with nn.ELU
+        Max epochs: 500
+        Stage: 3 months
+        No converagance checks
+205-211 
+    Max epochs doubled results in less smooth approximation. 
+    Now, measure epochs over time, this reveals that loss is never converging.
+    Fig 211 shows that it especially doesn't converage after the first stage. 
+212-218
+    Max epoch x10 (now, 10_000)
+    Re-implemented convergance check
+    Results: 
+        Allowing the model to train too much on early stages seems to cause overfitting. 
+        Though the time series seems to be discovered after a few stages, but totally breaks on the last stage.
+        Error increases over time.
+219-221
+    Max Epochs: 10_000, still
+    Stage: 7 months.
+    Purpose to test timeseries after first 'meta' curve (troughs/peaks around month 5).
+    Results:
+        Stage one - 
+            Overfitting
+            Seems to recognize a time series with decay.
+            Loss converged to tolerance but was still shrinking (POSSIBLE IT COULD HAVE FURTHER IMPROVED?)
+        Stage two -
+            Overfitting worsens.
+            Time series is faint, and decay is unchanged.
+            Error increasing.
+        FInal Stage -
+            Failed, flattened to the mean.
+222-241
+    Max Epochs: 100
+    Stage: 1 month
+    Purpose is a hail marry test for low training each data point one at a time.
+    Results:
+        Time series discovered at stage 6 (month after 'meta' curve)
+        Series curve improves by stage 12 (one year)
+        Series flattens by stage 14
+        Series completely fat by 15
+        Series redevelopes at 16
+        Series developes rapidly at 17
+        Series is better than fig 204!!
+        Convergence never detected.
+        SUCCESS
+242-261
+    Max Epochs: increased to 200
+    Purpose to test increased stage training
+    Results:
+        SAME AS LAST TEST
+        Except, series redevelopes faster (stage 13 instead of 16)
+        Final prediction similar
+262-xxx
+    Max Epochs: decreased to 50
+    Purpose to test decreased stage training
+    Results:
+        FAILED - time series never discovered
