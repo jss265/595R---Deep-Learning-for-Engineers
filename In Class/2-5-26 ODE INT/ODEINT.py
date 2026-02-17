@@ -29,10 +29,10 @@ class NeuralODE(nn.Module):
     def forward(self, y0, tsteps):
         return odeint(self.odefunc, y0, tsteps)  # TODO assert size
 
-def train(y_train, t_train, optimizer, lossfn):
+def train(y_train, t_train, optimizer, lossfn, y0):
     model.train()
     optimizer.zero_grad()
-    yhat = model(y0[0, :], t_train)
+    yhat = model(y0, t_train)
     loss = lossfn(yhat, y_train)
     loss.backward()
     optimizer.step()
@@ -54,6 +54,17 @@ if __name__ == '__main__':
     model = NeuralODE(nstates, hlayers, width).double()
 
     y0 = y_train[0, :]
+    
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    lossfn = nn.MSELoss()
+    
+    # Training loop
+    num_epochs = 1000
+    for epoch in range(num_epochs):
+        loss = train(y_train, t_train, optimizer, lossfn, y0)
+        if epoch % 100 == 0:
+            print(f'Epoch {epoch}, Loss: {loss:.6f}')
+    
     with torch.no_grad():
         yhat = model(y0, t_train)
     
