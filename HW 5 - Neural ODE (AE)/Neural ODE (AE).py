@@ -23,7 +23,7 @@ csv_filename = r'HW 5 - Neural ODE (AE)\Normalized Data.csv'
 fig_path = r'HW 5 - Neural ODE (AE)\Figs'
 
 train_size = 20
-ae_sizes = [4, 8, 2]  # (first) num features, AE layers, (last) latent dim
+ae_sizes = [4, 8, 2]  # (first) num features, AE layers, (last) latent dim NOTE [4, 8, 4, 2] failed to fit 
 latent_sizes = [2, 16, 2]  # (first) latent dim, hidden layers, (last) latent dim 
 activation = nn.ELU
 lr = 0.001
