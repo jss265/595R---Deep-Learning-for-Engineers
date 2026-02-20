@@ -1,0 +1,10 @@
+In figs folder:
+    Colab Log 1
+        001-002
+        Selected v6e-1 TPU but print statement says cpu?? no cuda??
+    Colab Log 2
+        no figs
+        GPU - can't remember which one but was too slow
+    Colab Log 3
+        003-004
+        H100 GPU - cuda used
