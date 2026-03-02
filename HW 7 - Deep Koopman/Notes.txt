@@ -1,0 +1,56 @@
+Koop.py was a wonderful exploration of linearizing dynamics.
+
+I would like to improve reconstruction/prediction error:
+    Implement general "roll-out" MSE loss
+        z_roll = z_k
+        loss = 0
+        for m in range(1, Sp+1):
+            z_roll = model.K(z_roll)
+            loss += loss_fn(z_roll, z[:, m:, :])
+
+    And possible add the following to strictly follow the referenced paper:
+        Paper: Deep learning for universal linear embeddings of nonlinear dynamics
+            Bethany Lusch, J. Nathan Kutz & Steven L. Brunton 
+            Nature Communications volume 9, Article number: 4950 (2018) 
+        Equation from paper:
+            (13) - for prediction loss
+        Term: 
+            loss = loss / Sp
+    
+    Why?
+        My current code only calculates loss from z_k to z_k+1. It is not generalize. Ask ChatGPT for explanations if needed.
+        My current code:
+            recon = loss_fn(model.autoencode(traj_batch), traj_batch)  # reconstruction loss
+
+            if train_AE_only:
+                loss = recon
+
+            else:
+                # Prediction Loss
+                # x_k ≈ xhat_k
+                x_k = traj_batch[:, :-1, :]
+                x_k_next = traj_batch[:, 1:, :]
+
+                x_k_next_pred = model(x_k)
+                pred = loss_fn(x_k_next_pred, x_k_next)
+                
+                # Linear Dynamics Loss (comparison inside latent space)
+                # z_k+m ≈ K^m z_k
+                z = model.encoder(traj_batch)
+
+                z_k = z[:, :-1, :]
+                z_k_next = z[:, 1:, :]
+
+                z_k_next_pred = model.K(z_k)
+                lin_dyn = loss_fn(z_k_next_pred, z_k_next)
+                
+                # Combined Loss
+                loss = a1*recon + a2*pred + a3*lin_dyn
+    
+    This would likely create much higher cost to training the model.
+    Dr. Ning said this was almost completely necessary 
+        OTHERWISE, it (say it stands right now) only learns next steps, like an ODE. It does not predict linear behavior.
+
+I would also like to make functions for loss. 
+    Rigth now my loss functions are somewhat hard coded considering that they are used nearly identically, twice
+    There are probably a couple other hard coded parts I could fix
