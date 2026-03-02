@@ -27,8 +27,7 @@ HP = {
     'epochs_ae': 50,  # learn latent representation
     'lr_full': 1e-4, # usually smaller for full model learning
     'epochs_full': 200,
-    'decay_alpha_full': 0,
-    'rollout_steps': 49,  # how many steps to roll out from z_0 (max = nt-1)
+    'decay_alpha_full': 0
 }
 
 # ------- Data Prep -------
@@ -36,7 +35,6 @@ ntraj = 2148  # number of trajectories
 nt = 50  # number of time steps
 ny = 7  # number of states
 assert HP['autoencoder_layers'][0] == ny, 'Failed: autoencoder_layers[0] == ny'
-assert HP['rollout_steps'] == nt - 1, "Failed: HP['rollout_steps'] == nt - 1"
 
 tvec = np.linspace(0, 350, nt)
 Y = np.loadtxt('HW 7 - Deep Koopman/kdata.txt').reshape(ntraj, nt, ny)
@@ -112,7 +110,6 @@ def train(
         optimizer: torch.optim.Optimizer,
         loss_fn: nn.Module,
         alphas: list,
-        rollout_steps: int = 1,
         train_AE_only: bool=False
         ):
 
@@ -131,22 +128,24 @@ def train(
             loss = recon
 
         else:
-            # Rollout from initial latent state z_0
-            # z_t = K^t * z_0  for t = 0 ... rollout_steps
-            z0 = model.encoder(traj_batch[:, 0, :])  # (B, latent)
-            z_roll = [z0]
-            for _ in range(rollout_steps):
-                z_roll.append(model.K(z_roll[-1]))
-            z_roll = torch.stack(z_roll, dim=1)  # (B, rollout_steps+1, latent)
+            # Prediction Loss
+            # x_k ≈ xhat_k
+            x_k = traj_batch[:, :-1, :]
+            x_k_next = traj_batch[:, 1:, :]
 
-            # Prediction Loss: Decoder(K^t z_0) vs x_t
-            x_roll = model.decoder(z_roll)  # (B, rollout_steps+1, ny)
-            pred = loss_fn(x_roll, traj_batch[:, :rollout_steps+1, :])
+            x_k_next_pred = model(x_k)
+            pred = loss_fn(x_k_next_pred, x_k_next)
+            
+            # Linear Dynamics Loss (comparison inside latent space)
+            # z_k+m ≈ K^m z_k
+            z = model.encoder(traj_batch)
 
-            # Linear Dynamics Loss: K^t z_0 vs Encoder(x_t)
-            z_true = model.encoder(traj_batch[:, :rollout_steps+1, :])  # (B, rollout_steps+1, latent)
-            lin_dyn = loss_fn(z_roll, z_true)
+            z_k = z[:, :-1, :]
+            z_k_next = z[:, 1:, :]
 
+            z_k_next_pred = model.K(z_k)
+            lin_dyn = loss_fn(z_k_next_pred, z_k_next)
+            
             # Combined Loss
             loss = a1*recon + a2*pred + a3*lin_dyn
             
@@ -162,7 +161,6 @@ def evaluate(
         loader: DataLoader,
         loss_fn: nn.Module,
         alphas: list,
-        rollout_steps: int = 1,
         train_AE_only: bool=False):
 
     model.eval()
@@ -180,22 +178,24 @@ def evaluate(
                 loss = recon
 
             else:
-                # Rollout from initial latent state z_0
-                # z_t = K^t * z_0  for t = 0 ... rollout_steps
-                z0 = model.encoder(traj_batch[:, 0, :])  # (B, latent)
-                z_roll = [z0]
-                for _ in range(rollout_steps):
-                    z_roll.append(model.K(z_roll[-1]))
-                z_roll = torch.stack(z_roll, dim=1)  # (B, rollout_steps+1, latent)
+                # Prediction Loss
+                # x_k ≈ xhat_k
+                x_k = traj_batch[:, :-1, :]
+                x_k_next = traj_batch[:, 1:, :]
 
-                # Prediction Loss: Decoder(K^t z_0) vs x_t
-                x_roll = model.decoder(z_roll)  # (B, rollout_steps+1, ny)
-                pred = loss_fn(x_roll, traj_batch[:, :rollout_steps+1, :])
+                x_k_next_pred = model(x_k)
+                pred = loss_fn(x_k_next_pred, x_k_next)
+                
+                # Linear Dynamics Loss (comparison inside latent space)
+                # z_k+m ≈ K^m z_k
+                z = model.encoder(traj_batch)
 
-                # Linear Dynamics Loss: K^t z_0 vs Encoder(x_t)
-                z_true = model.encoder(traj_batch[:, :rollout_steps+1, :])  # (B, rollout_steps+1, latent)
-                lin_dyn = loss_fn(z_roll, z_true)
+                z_k = z[:, :-1, :]
+                z_k_next = z[:, 1:, :]
 
+                z_k_next_pred = model.K(z_k)
+                lin_dyn = loss_fn(z_k_next_pred, z_k_next)
+                
                 # Combined Loss
                 loss = a1*recon + a2*pred + a3*lin_dyn
                 
@@ -276,7 +276,6 @@ if __name__ == '__main__':
             full_optimizer,
             HP['loss_function'],
             HP['objective_alphas'],
-            rollout_steps=HP['rollout_steps'],
             train_AE_only=False
             )
         train_losses.append(train_loss)
@@ -286,7 +285,6 @@ if __name__ == '__main__':
             test_loader,
             HP['loss_function'],
             HP['objective_alphas'],
-            rollout_steps=HP['rollout_steps'],
             train_AE_only=False
         )
         test_losses.append(test_loss)
