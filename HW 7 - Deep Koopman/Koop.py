@@ -8,8 +8,10 @@ from torch.utils.data import TensorDataset, DataLoader
 batch_size = 256
 autoencoder_layers = []  # list encoder layers only, latent dimension is last element of list
 k_init_std = 0.01
+objective_alphas = [1.0, 1.0, 1.0]  # a1 reconstruction, a2 prediction, a3 linear dynamics
+decay_alpha = 1e-4
 activation_function = nn.ELU
-loss_function = nn.MSELoss
+loss_function = nn.MSELoss()
 
 # ------- Data Prep -------
 ntraj = 2148  # number of trajectories
@@ -80,25 +82,65 @@ class KoopmanModel(nn.Module):
         z_next = self.K(z)
         x_next_pred = self.decoder(z_next)
         return x_next_pred
-
-# ------- Loss Functions -------
-    # MSELoss(x_recon, x)
-    # loss_lin_dyn = mse(K(z_k), z_k_next)
-    # loss_pred = mse(x_next_pred, x_next)
-# ------- Trainings -------
-def train(model, loader, optimizer, loss_fn, train_AE_only=False):
-    model.train()
-    optimizer.zero_grad()
-
-    if train_AE_only:
-        ...
-    else:
-        ...
     
-    loss.backward()
-    optimizer.step()
+    def autoencode(self, x):
+        z = self.encoder(x)
+        x_decoded = self.decoder(z)
+        return x_decoded
 
-    return loss.item()
+# ------- Trainings -------
+def train(
+        model: KoopmanModel,
+        loader: DataLoader,
+        optimizer: torch.optim.Optimizer,
+        loss_fn: nn.Module,
+        alphas: list,
+        train_AE_only: bool=False
+        ):
+
+    model.train()
+    total_loss = 0.0
+    a1, a2, a3 = alphas
+
+    for (traj_batch,) in loader:  # shape: batch_size, nt, ny
+        optimizer.zero_grad()
+
+        # Reconstruction Loss
+        # x_k ≈ x_k (encoded/decoded only)
+        recon = loss_fn(model.autoencode(traj_batch), traj_batch)  # reconstruction loss
+
+        if train_AE_only:
+            loss = recon
+
+        else:
+            # Prediction Loss
+            # x_k ≈ xhat_k
+            x_k = traj_batch[:, :-1, :]
+            x_k_next = traj_batch[:, 1:, :]
+
+            x_k_next_pred = model(x_k)
+            pred = loss_fn(x_k_next_pred, x_k_next)
+            
+            # Linear Dynamics Loss (comparison inside latent space)
+            # z_k+m ≈ K^m z_k
+            z = model.encoder(traj_batch)
+
+            z_k = z[:, :-1, :]
+            z_k_next = z[:, 1:, :]
+
+            z_k_next_pred = model.K(z_k)
+            lin_dyn = loss_fn(z_k_next_pred, z_k_next)
+            
+            # Combined Loss
+            loss = a1*recon + a2*pred + a3*lin_dyn
+            
+        loss.backward()
+        optimizer.step()
+        
+        total_loss += loss.item()
+
+    return total_loss
+    
 # ------- Main -------
 
 
