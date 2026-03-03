@@ -17,18 +17,18 @@ HP = {
     'activation_function': nn.ELU,
     'loss_function': nn.MSELoss(),
     'optimizer_class': torch.optim.AdamW,
-    'trajectory_limit': 50,
-    'train_batch_size': 15,
+    'trajectory_limit': 20,
+    'train_batch_size': 5,
     'test_batch_size': 100,  # recommended full length of test trajectories
     'autoencoder_layers': [7, 17, 22, 27],  # list encoder layers only, latent dimension is last element of list
     'k_init_std': 0.01,
     'objective_alphas': [0.5, 0.75, 1.75],  # a1 reconstruction, a2 prediction, a3 linear dynamics
     'decay_alpha_ae': 1e-4,
     'lr_ae': 1e-3,
-    'epochs_ae': 50,  # learn latent representation
+    'epochs_ae': 100,  # learn latent representation
     'lr_full': 1e-4,  # usually smaller for full model learning
-    'epochs_full': 200,
-    'decay_alpha_full': 0
+    'epochs_full': 20000,
+    'decay_alpha_full': 0,
 }
 
 # ------- Data Prep -------
@@ -36,13 +36,13 @@ ntraj = 2148  # number of trajectories
 nt = 50  # number of time steps
 ny = 7  # number of states
 assert HP['autoencoder_layers'][0] == ny, 'Failed: autoencoder_layers[0] == ny'
-assert HP['trajectory_limit'] >= ntraj - 100, 'Failed: trajectory_limit >= ntraj - 100'
+assert HP['trajectory_limit'] <= ntraj - 100, 'Failed: trajectory_limit <= ntraj - 100'
 assert HP['trajectory_limit'] >= HP['train_batch_size'], 'Failed: trajectory_limit >= train_batch_size'
 
 tvec = np.linspace(0, 350, nt)
 Y = np.loadtxt('HW 7 - Deep Koopman/kdata.txt').reshape(ntraj, nt, ny)
-Ytrain = Y[:HP['trajectory_limit'], :, :]  # 2048 total training trajectories
-Ytest = Y[2048:, :, :]  # last 100 trajectories are testing trajectoreis
+Ytrain = Y[:HP['trajectory_limit'], :, :]  # limited to 2048 or less total training trajectories
+Ytest = Y[2048:, :, :]  # last 100 trajectories are testing trajectories
 print(f'Loaded data:\n    Ytrain size: {Ytrain.shape}\n    Ytest shape {Ytest.shape}')
 print('    Shape: trajectories (trial runs), time steps, states')
 
@@ -56,18 +56,18 @@ test_loader = DataLoader(test_dataset, batch_size=HP['test_batch_size'], shuffle
 
 # ------- Net Creations -------
 class Encoder(nn.Module):
-        def __init__(self, layer_list, activation):
-            super().__init__()
-            
-            layers = []
-            for i in range(len(layer_list) - 1):
-                layers.append(nn.Linear(layer_list[i], layer_list[i+1]))
-                if i < len(layer_list) - 2:
-                    layers.append(activation())
-            self.encoder = nn.Sequential(*layers)
-            
-        def forward(self, x):
-            return self.encoder(x)
+    def __init__(self, layer_list, activation):
+        super().__init__()
+        
+        layers = []
+        for i in range(len(layer_list) - 1):
+            layers.append(nn.Linear(layer_list[i], layer_list[i+1]))
+            if i < len(layer_list) - 2:
+                layers.append(activation())
+        self.encoder = nn.Sequential(*layers)
+        
+    def forward(self, x):
+        return self.encoder(x)
 
 class Decoder(nn.Module):
     def __init__(self, layer_list, activation):
@@ -119,6 +119,34 @@ class KoopmanModel(nn.Module):
         x_decoded = self.decoder(z)
         return x_decoded
 
+# ------- Loss -------
+def get_loss(
+        model: KoopmanModel,
+        traj_batch: torch.Tensor,
+        loss_fn: nn.Module,
+        alphas: list,
+        train_AE_only: bool=False
+        ) -> torch.Tensor:
+
+    a1, a2, a3 = alphas
+
+    # Reconstruction Loss: x_k ≈ decoder(encoder(x_k))
+    recon = loss_fn(model.autoencode(traj_batch), traj_batch)  # [B, nt, ny]
+
+    if train_AE_only:
+        return recon
+
+    x = traj_batch[:, 1:, :]  # true x_i+1..x_T: [B, nt-1, ny]
+    z, z_pred, x_pred = model(traj_batch)  # z: [B, nt-1, latent_dim], z_pred: [B, nt-1, latent_dim], x_pred: [B, nt-1, ny]
+
+    # Prediction Loss: decoder(K^m z_1) ≈ x_{m+1}
+    pred = loss_fn(x_pred, x)
+
+    # Linear Dynamics Loss: K^m z_1 ≈ encoder(x_{m+1})
+    lin_dyn = loss_fn(z_pred, z)
+
+    return a1*recon + a2*pred + a3*lin_dyn
+
 # ------- Trainings -------
 def train(
         model: KoopmanModel,
@@ -131,46 +159,12 @@ def train(
 
     model.train()
     total_loss = 0.0
-    a1, a2, a3 = alphas
 
     for (traj_batch,) in loader:  # traj_batch shape: [batch_size, nt, ny]
         optimizer.zero_grad()
-
-        # Reconstruction Loss
-        # x_k ≈ x_k (encoded/decoded only)
-        recon = loss_fn(model.autoencode(traj_batch), traj_batch)  # reconstruction loss
-
-        if train_AE_only:
-            loss = recon
-
-        else:
-            x = traj_batch[:, 1:, :]  # [B, nt - 1, ny]
-            z, z_pred, x_pred = model(traj_batch)  # [B, nt - 1, latent_dim], [B, nt - 1, latent_dim], [B, nt - 1, ny]
-
-            # Prediction Loss
-            # x_k ≈ xhat_k
-
-
-            x_k_next_pred = model(x)
-            pred = loss_fn(x_k_next_pred, x_k_next)
-            
-            # Linear Dynamics Loss (comparison inside latent space)
-            # z_k+m ≈ K^m z_k
-            fix
-            z = model.encoder(traj_batch)
-
-            z_k = z[:, :-1, :]
-            z_k_next = z[:, 1:, :]
-
-            z_k_next_pred = model.K(z_k)
-            lin_dyn = loss_fn(z_k_next_pred, z_k_next)
-            
-            # Combined Loss
-            loss = a1*recon + a2*pred + a3*lin_dyn
-            
+        loss = get_loss(model, traj_batch, loss_fn, alphas, train_AE_only)
         loss.backward()
         optimizer.step()
-        
         total_loss += loss.item()
 
     return total_loss / len(loader)
@@ -184,40 +178,10 @@ def evaluate(
 
     model.eval()
     total_loss = 0.0
-    a1, a2, a3 = alphas
 
     with torch.no_grad():
-        for (traj_batch,) in loader:  # shape: batch_size, nt, ny
-
-            # Reconstruction Loss
-            # x_k ≈ x_k (encoded/decoded only)
-            recon = loss_fn(model.autoencode(traj_batch), traj_batch)  # reconstruction loss
-
-            if train_AE_only:
-                loss = recon
-
-            else:
-                # Prediction Loss
-                # x_k ≈ xhat_k
-                x_k = traj_batch[:, :-1, :]
-                x_k_next = traj_batch[:, 1:, :]
-
-                x_k_next_pred = model(x_k)
-                pred = loss_fn(x_k_next_pred, x_k_next)
-                
-                # Linear Dynamics Loss (comparison inside latent space)
-                # z_k+m ≈ K^m z_k
-                z = model.encoder(traj_batch)
-
-                z_k = z[:, :-1, :]
-                z_k_next = z[:, 1:, :]
-
-                z_k_next_pred = model.K(z_k)
-                lin_dyn = loss_fn(z_k_next_pred, z_k_next)
-                
-                # Combined Loss
-                loss = a1*recon + a2*pred + a3*lin_dyn
-                
+        for (traj_batch,) in loader:  # traj_batch shape: [batch_size, nt, ny]
+            loss = get_loss(model, traj_batch, loss_fn, alphas, train_AE_only)
             total_loss += loss.item()
 
     return total_loss / len(loader)
@@ -268,7 +232,7 @@ if __name__ == '__main__':
     plt.plot(range(HP['epochs_ae']), train_losses, label='Train Loss')
     plt.plot(range(HP['epochs_ae']), test_losses, label='Test Loss')
     plt.title('Learning Latent Representation with Reconstruction Loss')
-    plt.ylabel('MSE Error')
+    plt.ylabel('Total Loss')
     plt.xlabel('Epoch')
     plt.legend()
     plt.yscale('log')
@@ -285,8 +249,6 @@ if __name__ == '__main__':
         weight_decay=HP['decay_alpha_full']
     )
     
-    train_losses = []
-    test_losses = []
     for i in range(HP['epochs_full']):
         train_loss = train(
             model,
@@ -310,11 +272,11 @@ if __name__ == '__main__':
         print(f'Epoch {i+1}:\n    Train Loss: {train_loss:.6f}\n    Test Loss: {test_loss:.6f}')
     
     fig = plt.figure()
-    plt.plot(range(HP['epochs_full']), train_losses, label='Train Loss')
-    plt.plot(range(HP['epochs_full']), test_losses, label='Test Loss')
+    plt.plot(range(HP['epochs_full']+HP['epochs_ae']), train_losses, label='Train Loss')
+    plt.plot(range(HP['epochs_full']+HP['epochs_ae']), test_losses, label='Test Loss')
     plt.title('Learning Full Koopman Model with Objective')
-    plt.ylabel('MSE Error')
-    plt.xlabel('Epoch')
+    plt.ylabel('Total Loss')
+    plt.xlabel(f"Epoch (AE only first {HP['epochs_ae']})")
     plt.legend()
     plt.yscale('log')
     jss.text_box_to_fig(fig, HP)

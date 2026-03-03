@@ -1,6 +1,6 @@
 Koop.py was a wonderful exploration of linearizing dynamics.
 
-I would like to improve reconstruction/prediction error:
+(!*ALL OF THIS WAS IMPLEMENTED BEFORE TURN IN. 'current code' IS OLD CODE*!)I would like to improve reconstruction/prediction error:
     Implement general "roll-out" MSE loss
         z_roll = z_k
         loss = 0
@@ -51,6 +51,6 @@ I would like to improve reconstruction/prediction error:
     Dr. Ning said this was almost completely necessary 
         OTHERWISE, it (say it stands right now) only learns next steps, like an ODE. It does not predict linear behavior.
 
-I would also like to make functions for loss. 
+(!*ALSO FIXED*!)I would also like to make functions for loss. 
     Rigth now my loss functions are somewhat hard coded considering that they are used nearly identically, twice
     There are probably a couple other hard coded parts I could fix
