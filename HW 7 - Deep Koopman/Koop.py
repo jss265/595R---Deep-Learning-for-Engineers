@@ -17,7 +17,8 @@ HP = {
     'activation_function': nn.ELU,
     'loss_function': nn.MSELoss(),
     'optimizer_class': torch.optim.AdamW,
-    'train_batch_size': 256,
+    'trajectory_limit': 50,
+    'train_batch_size': 15,
     'test_batch_size': 100,  # recommended full length of test trajectories
     'autoencoder_layers': [7, 17, 22, 27],  # list encoder layers only, latent dimension is last element of list
     'k_init_std': 0.01,
@@ -25,7 +26,7 @@ HP = {
     'decay_alpha_ae': 1e-4,
     'lr_ae': 1e-3,
     'epochs_ae': 50,  # learn latent representation
-    'lr_full': 1e-4, # usually smaller for full model learning
+    'lr_full': 1e-4,  # usually smaller for full model learning
     'epochs_full': 200,
     'decay_alpha_full': 0
 }
@@ -35,11 +36,13 @@ ntraj = 2148  # number of trajectories
 nt = 50  # number of time steps
 ny = 7  # number of states
 assert HP['autoencoder_layers'][0] == ny, 'Failed: autoencoder_layers[0] == ny'
+assert HP['trajectory_limit'] >= ntraj - 100, 'Failed: trajectory_limit >= ntraj - 100'
+assert HP['trajectory_limit'] >= HP['train_batch_size'], 'Failed: trajectory_limit >= train_batch_size'
 
 tvec = np.linspace(0, 350, nt)
 Y = np.loadtxt('HW 7 - Deep Koopman/kdata.txt').reshape(ntraj, nt, ny)
-Ytrain = Y[:2048, :, :]  # 2048 training trajectories
-Ytest = Y[2048:, :, :]  # 100 testing trajectoreis
+Ytrain = Y[:HP['trajectory_limit'], :, :]  # 2048 total training trajectories
+Ytest = Y[2048:, :, :]  # last 100 trajectories are testing trajectoreis
 print(f'Loaded data:\n    Ytrain size: {Ytrain.shape}\n    Ytest shape {Ytest.shape}')
 print('    Shape: trajectories (trial runs), time steps, states')
 
@@ -92,11 +95,24 @@ class KoopmanModel(nn.Module):
         self.K = nn.Linear(latent_dim, latent_dim, bias=False)
         nn.init.normal_(self.K.weight, mean=0.0, std=k_init_std)
 
-    def forward(self, x):
+    def forward(self, x):  # x shape: [B, nt, ny]
+        # Create z
         z = self.encoder(x)
-        z_next = self.K(z)
-        x_next_pred = self.decoder(z_next)
-        return x_next_pred
+        z_roll = z[:, 0:1, :]
+        z = z[:, 1:, :]  # [B, nt - 1, latent_dim]
+
+        # Create z_pred
+        z_pred = []
+        T = z.shape[1]
+        for _ in range(T):
+            z_roll = self.K(z_roll)
+            z_pred.append(z_roll)
+        z_pred = torch.cat(z_pred, dim=1)  # [B, nt - 1, latent_dim]
+        
+        # Create x_pred
+        x_pred = self.decoder(z_pred)  # [B, nt-1, ny]
+        
+        return z, z_pred, x_pred
     
     def autoencode(self, x):
         z = self.encoder(x)
@@ -117,7 +133,7 @@ def train(
     total_loss = 0.0
     a1, a2, a3 = alphas
 
-    for (traj_batch,) in loader:  # shape: batch_size, nt, ny
+    for (traj_batch,) in loader:  # traj_batch shape: [batch_size, nt, ny]
         optimizer.zero_grad()
 
         # Reconstruction Loss
@@ -128,16 +144,19 @@ def train(
             loss = recon
 
         else:
+            x = traj_batch[:, 1:, :]  # [B, nt - 1, ny]
+            z, z_pred, x_pred = model(traj_batch)  # [B, nt - 1, latent_dim], [B, nt - 1, latent_dim], [B, nt - 1, ny]
+
             # Prediction Loss
             # x_k ≈ xhat_k
-            x_k = traj_batch[:, :-1, :]
-            x_k_next = traj_batch[:, 1:, :]
 
-            x_k_next_pred = model(x_k)
+
+            x_k_next_pred = model(x)
             pred = loss_fn(x_k_next_pred, x_k_next)
             
             # Linear Dynamics Loss (comparison inside latent space)
             # z_k+m ≈ K^m z_k
+            fix
             z = model.encoder(traj_batch)
 
             z_k = z[:, :-1, :]
@@ -204,7 +223,6 @@ def evaluate(
     return total_loss / len(loader)
 
 # ------- Main -------
-
 
 if __name__ == '__main__':
     
