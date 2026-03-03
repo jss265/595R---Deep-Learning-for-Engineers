@@ -17,18 +17,18 @@ HP = {
     'activation_function': nn.ELU,
     'loss_function': nn.MSELoss(),
     'optimizer_class': torch.optim.AdamW,
-    'trajectory_limit': 20,
-    'train_batch_size': 5,
+    'trajectory_limit': 500,
+    'train_batch_size': 15,
     'test_batch_size': 100,  # recommended full length of test trajectories
     'autoencoder_layers': [7, 17, 22, 27],  # list encoder layers only, latent dimension is last element of list
     'k_init_std': 0.01,
     'objective_alphas': [0.5, 0.75, 1.75],  # a1 reconstruction, a2 prediction, a3 linear dynamics
     'decay_alpha_ae': 1e-4,
     'lr_ae': 1e-3,
-    'epochs_ae': 100,  # learn latent representation
+    'epochs_ae': 250,  # learn latent representation
     'lr_full': 1e-4,  # usually smaller for full model learning
-    'epochs_full': 7500,
-    'decay_alpha_full': 0,
+    'epochs_full': 15000,
+    'decay_alpha_full': 1e-4,
 }
 
 # ------- Data Prep -------
