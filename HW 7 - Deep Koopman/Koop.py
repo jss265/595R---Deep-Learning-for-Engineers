@@ -27,7 +27,7 @@ HP = {
     'lr_ae': 1e-3,
     'epochs_ae': 100,  # learn latent representation
     'lr_full': 1e-4,  # usually smaller for full model learning
-    'epochs_full': 20000,
+    'epochs_full': 7500,
     'decay_alpha_full': 0,
 }
 
