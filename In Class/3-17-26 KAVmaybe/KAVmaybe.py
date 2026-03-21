@@ -8,6 +8,7 @@ from pysr import *  # import this (juliapkg) before torch
 # model.fit(X, y)
 # print(model)
 
+# EXAMPLE FROM class
 data = np.loadtxt('subset.cvs', delimiter=',')
 y = data[:,0]  # outputs
 X = data[:,1:]  # inputs
