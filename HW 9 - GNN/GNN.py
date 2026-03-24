@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import hw9setup as hw9
 
 HP = {
-    'middle layers': [32, 16],
+    'middle layers': [16, 16, 16],
     'activation': nn.ReLU,
     'aggr': 'mean',
     'optim': torch.optim.Adam,
