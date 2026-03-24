@@ -21,7 +21,7 @@ HP = {
     'sch_factor': 0.5,
     'sch_patience': 3,
     'sch_min_lr':1e-6,
-    'epochs': 4,
+    'epochs': 150,
     'lr': 1e-2,
     'batch_size': 128,
     'loss_fn': nn.L1Loss
