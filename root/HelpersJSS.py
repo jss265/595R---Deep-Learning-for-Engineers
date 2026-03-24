@@ -59,6 +59,6 @@ def text_box_to_fig(fig, hyper_params):
         ha='center',
         va='bottom',
         multialignment='left',
-        fontsize=9,
+        fontsize=2,  # fontsize = max(5, 10 - 0.3 * len(hyper_params)) something like this is another idea
         bbox=dict(boxstyle='round', facecolor='white', alpha=0.8)
     )
