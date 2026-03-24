@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import hw9setup as hw9
 
 HP = {
-    'middle layers': [16, 16, 16],
+    'middle layers': [32, 32],
     'activation': nn.ReLU,
     'aggr': 'mean',
     'optim': torch.optim.Adam,
@@ -25,7 +25,7 @@ HP = {
     'epochs': 150,
     'lr': 1e-2,
     'batch_size': 128,
-    'loss_fn': nn.L1Loss
+    'loss_fn': nn.MSELoss  # was L1Loss
 }
 
 class GNN(MessagePassing):
