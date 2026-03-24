@@ -8,7 +8,7 @@ def data_setup():
 
     # ------------ import data ------------
     # 1000 trajectory sets with 100 time steps split 75/25 for training/testing
-    data = np.load("spring_data.npz")
+    data = np.load("HW 9 - GNN/spring_data.npz")
     # X_train (75000, 4, 5)  data points, 4 particles, 5 states: x, y, Vx, Vy, m (positions, velocities, mass)
     X_train = torch.tensor(data['X_train'], dtype=torch.float32)
     # y_train (75000, 4, 2)  data points, 4 particles, 2 states: ax, ay (accelerations)
@@ -60,7 +60,7 @@ def data_setup():
     # - when you put the data into a DataLoader, you'll want to shuffle the data
     #   so that you'll pulling from different trajectories
     # - note that Data and DataLoader in torch_geometric are a bit different
-
+    return
     return train_loader, test_loader, train_traj, test_traj
 
 
