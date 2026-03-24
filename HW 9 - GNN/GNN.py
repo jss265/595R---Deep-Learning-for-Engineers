@@ -15,6 +15,7 @@ import hw9setup as hw9
 HP = {
     'middle layers': [32, 32],
     'activation': nn.ReLU,
+    'aggr': 'mean',
     'optim': torch.optim.Adam,
     'scheduler': torch.optim.lr_scheduler.ReduceLROnPlateau,
     'sch_mode': 'min',
@@ -28,7 +29,7 @@ HP = {
 }
 
 class GNN(MessagePassing):
-    def __init__(self, middle_layers, activation, aggr='add'):  # Davis suggest mean, and I don't know why... lol
+    def __init__(self, middle_layers, activation, aggr):  # origionally tried add, mean is supposed to average signal as number of neighbors grow
         super().__init__(aggr=aggr)
 
         num_features = 5  # x, y, Vx, Vy, m
@@ -99,7 +100,7 @@ def y_prime(t, y, model, edge_index, constant_terms):
 
 if __name__ == "__main__":
     # define model, optimizer, scheduler, and loss function
-    model = GNN(HP['middle layers'], HP['activation'])
+    model = GNN(HP['middle layers'], HP['activation'], HP['aggr'])
     optimizer = HP['optim'](model.parameters(), lr=HP['lr'])
     sch_kargs = {
         'mode': HP['sch_mode'],
