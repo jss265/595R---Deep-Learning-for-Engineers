@@ -21,7 +21,7 @@ HP = {
     'sch_factor': 0.5,
     'sch_patience': 3,
     'sch_min_lr':1e-6,
-    'epochs': 128,
+    'epochs': 4,
     'lr': 1e-2,
     'batch_size': 128,
     'loss_fn': nn.L1Loss
@@ -176,12 +176,14 @@ if __name__ == "__main__":
     plt.xlabel("x position")
     plt.ylabel("y position")
     plt.title("True vs Predicted Trajectories")
+    jss.text_box_to_fig(fig, HP)
+    jss.savePicInSequence(fig, 'HW 9 - GNN/figs')
 
-    plt.figure()
+    fig = plt.figure()
     plt.plot(train_losses, label="Train Loss")
     plt.plot(test_losses, label="Test Loss")
     plt.xlabel("Epoch")
-    plt.ylabel(f"Loss ({HP['loss_fn']})")
+    plt.ylabel(f"Loss ({HP['loss_fn'].__name__})")
     plt.title("Training vs Testing Loss")
     plt.legend()
     jss.text_box_to_fig(fig, HP)

@@ -32,33 +32,37 @@ def savePicInSequence(figure, folder_path):
 
 def text_box_to_fig(fig, hyper_params):
     """
-    Adds a hyperparameter text box to a matplotlib figure.
-    
+    Adds a hyperparameter text box to a matplotlib figure,
+    reserving ~1/3 of the figure for the text at the bottom,
+    and ensures it doesn't overlap the y-axis labels.
+
     Parameters:
-        fig : matplotlib figure
+        fig : matplotlib.figure.Figure
         hyper_params : dict
     """
-    ax = fig.gca()
+    # Compute text strings
+    text_lines = []
+    for key, value in hyper_params.items():
+        if isinstance(value, type):  # class
+            text_lines.append(f"{key}: {value.__name__}")
+        else:
+            text_lines.append(f"{key}: {value}")
+    text = "\n".join(text_lines)
 
-    text = "\n".join(
-        f"{key}: {value}" for key, value in hyper_params.items()
-    )
+    # Reserve bottom 1/3 for text
+    bottom_reserved = 0.35  # ~1/3 for text box
+    fig.subplots_adjust(bottom=bottom_reserved + 0.05)  # extra margin for y-axis
 
-    # Calculate height for text box
-    num_params = len(hyper_params)
-    text_height = 0.03 * num_params  # heuristic factor
-    bottom_margin = text_height + 0.1  # base margin + text height
+    # Center the text inside the reserved bottom space
+    y_center = bottom_reserved / 2
 
-    # Adjust plot layout to make room for text at the bottom
-    fig.subplots_adjust(bottom=bottom_margin)
-
-    # Place text below the axes, centered horizontally, text aligned right
+    # Place the text
     fig.text(
-        0.5, 0.01,   # x, y coordinates (0.5 center, 0.01 bottom)
+        0.5, y_center,
         text,
         ha='center',
-        va='bottom',
+        va='center',
         multialignment='left',
-        fontsize=2,  # fontsize = max(5, 10 - 0.3 * len(hyper_params)) something like this is another idea
+        fontsize=max(5, 10 - 0.3 * len(hyper_params)),
         bbox=dict(boxstyle='round', facecolor='white', alpha=0.8)
     )
