@@ -96,7 +96,7 @@ print(f"Spline KAN   R² = {r2_spline:.4f}")
 # convert to symbolic, train some more, and check predictions again
 model.auto_symbolic(weight_simple=0.1)  # 0 keeps it complex, 1 makes it completely simple at the trade-off to fit
 
-model.fit(dataset, opt='LBFGS', steps=25, lr=1)
+model.fit(dataset, opt='LBFGS', steps=25, lr=1, update_grid=False)  # udate_grid=False added due to crash
 
 sym_expr = ex_round(model.symbolic_formula(var=feature_names)[0][0], 4)
 print(sym_expr)
