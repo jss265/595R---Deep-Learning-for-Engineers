@@ -1,6 +1,7 @@
 import csv
 import queue
 import msvcrt
+import sys
 import threading
 import time
 import winsound
@@ -8,6 +9,7 @@ from pathlib import Path
 
 from daq_reader import DAQReader
 
+FILE_PATH = 'recordings/training1'
 
 def begin_test():
 
@@ -53,7 +55,7 @@ def safe_name(text):
     return ''.join(char if char.isalnum() else '_' for char in text).strip('_')
 
 def save_window_csv(subject, arm, label, samples):
-    out_dir = Path(__file__).resolve().parent / 'recordings'
+    out_dir = Path(__file__).resolve().parent / FILE_PATH
     out_dir.mkdir(exist_ok=True)
 
     stamp = time.strftime('%Y%m%d-%H%M%S')
@@ -90,6 +92,8 @@ def main():
     daq = DAQReader()
     recording = threading.Event()
     sample_queue = queue.Queue()
+    recording_start_time = None
+    last_status_length = 0
 
     def drain_samples():
         samples = []
@@ -126,14 +130,19 @@ def main():
                     if not recording.is_set():
                         drain_samples()
                         recording.set()
+                        recording_start_time = time.perf_counter()
+                        last_status_length = 0
                         print('Recording...')
                     else:
                         recording.clear()
+                        sys.stdout.write('\r' + (' ' * last_status_length) + '\r')
+                        sys.stdout.flush()
+                        seconds_elapsed = 0.0 if recording_start_time is None else time.perf_counter() - recording_start_time
                         window_samples = drain_samples()
 
                     if window_samples is not None:
                         hz = compute_window_hz(window_samples)
-                        print(f'Recording stopped. HZ: {hz:6.1f}')
+                        print(f'Recording stopped. HZ: {hz:6.1f}, Seconds: {seconds_elapsed:6.1f}.')
                         label = label_num_reps()
 
                         if label is False:
@@ -144,10 +153,18 @@ def main():
 
                         print('Press space to record the next window or q to quit.')
 
+            if recording.is_set() and recording_start_time is not None:
+                elapsed_s = time.perf_counter() - recording_start_time
+                status_line = f'Recording elapsed: {elapsed_s:6.1f} s'
+                last_status_length = max(last_status_length, len(status_line))
+                sys.stdout.write('\r' + status_line.ljust(last_status_length))
+                sys.stdout.flush()
+
             time.sleep(0.1)
     except KeyboardInterrupt:
         pass
     finally:
+
         daq.stop()
         winsound.Beep(750, 2000)
         print('DAQ halted')

@@ -2,8 +2,8 @@ from collections import Counter
 import csv
 from pathlib import Path
 
-
-RECORDINGS_DIR = Path(__file__).resolve().parent / 'recordings'
+FOLDER = 'recordings/training1'
+RECORDINGS_DIR = Path(__file__).resolve().parent / FOLDER
 LOW_HZ_THRESHOLD = 99.0
 
 
@@ -91,7 +91,7 @@ def _report_duplicate_counts(records):
 def main():
 	records, low_hz_files = _scan_recordings()
 
-	print(f'Found {len(records)} recording file(s).')
+	print(f'Found {len(records)} recording file(s) in {FOLDER}.')
 	print(f'{len(low_hz_files)} file(s) are below {LOW_HZ_THRESHOLD:g} Hz.')
 
 	_delete_low_hz_files(low_hz_files)
