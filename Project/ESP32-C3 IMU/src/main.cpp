@@ -30,12 +30,12 @@ void setup() {
     mpu.dmpInitialize();
 
     // Calibration
-mpu.setXAccelOffset(7274);
-mpu.setYAccelOffset(3856);
-mpu.setZAccelOffset(9610);
-mpu.setXGyroOffset(-61);
-mpu.setYGyroOffset(-82);
-mpu.setZGyroOffset(7);
+    mpu.setXAccelOffset(7274);
+    mpu.setYAccelOffset(3856);
+    mpu.setZAccelOffset(9610);
+    mpu.setXGyroOffset(-61);
+    mpu.setYGyroOffset(-82);
+    mpu.setZGyroOffset(7);
 
     mpu.setDMPEnabled(true);
     mpu.setIntEnabled(0x12);
