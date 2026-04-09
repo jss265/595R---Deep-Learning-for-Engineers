@@ -40,8 +40,8 @@ class DAQReader:
                 ts, q, aa, gg = self.read_packet()
             except (serial.SerialException, OSError, IndexError, struct.error):
                 self._running = False
-                winsound.Beep(1000, 2000)
                 print("Serial disconnected")
+                winsound.Beep(1000, 2000)
                 break
             self.sample_times.append(time.perf_counter())
             if self._data_callback:

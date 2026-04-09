@@ -14,6 +14,11 @@ def print_MPU_sample(ts, q, aa, gg):
 daq = DAQReader()
 daq.start(callback=print_MPU_sample)
 
-# main thread can do other things or sleep
-while True:
-    time.sleep(1)
+try:
+    while daq._running:
+        time.sleep(1)
+except KeyboardInterrupt:
+    pass
+finally:
+    time.sleep(2)
+    daq.stop()

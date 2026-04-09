@@ -9,5 +9,11 @@ def record_MPU_sample(ts, q, aa, gg):
 daq = DAQReader()
 daq.start(callback=record_MPU_sample)
 
-while True:
-    time.sleep(1)
+try:
+    while daq._running:
+        time.sleep(1)
+except KeyboardInterrupt:
+    pass
+finally:
+    time.sleep(2)
+    daq.stop()
