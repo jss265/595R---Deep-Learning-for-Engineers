@@ -71,9 +71,20 @@ def save_window_csv(subject, arm, label, samples):
         writer.writerow(['arm', arm])
         writer.writerow(['label', label])
         writer.writerow(['hz', compute_window_hz(samples)])
+        writer.writerow(['time', compute_window_time(samples)])
         writer.writerow([])
         writer.writerow(['timestamp_us', 'q0', 'q1', 'q2', 'q3', 'ax', 'ay', 'az', 'gx', 'gy', 'gz'])
         writer.writerows(samples)
+
+def compute_window_time(samples):
+    if len(samples) < 2:
+        return 0.0
+
+    elapsed_us = samples[-1][0] - samples[0][0]
+    if elapsed_us <= 0:
+        return 0.0
+
+    return elapsed_us / 1_000_000.0
 
 def compute_window_hz(samples):
     if len(samples) < 2:
