@@ -1,3 +1,5 @@
+import msvcrt
+import winsound
 import time
 from daq_reader import DAQReader
 
@@ -11,9 +13,12 @@ daq.start(callback=record_MPU_sample)
 
 try:
     while daq._running:
-        time.sleep(1)
+        if msvcrt.kbhit() and msvcrt.getwch().lower() == 'q':
+            break
+        time.sleep(0.01)
 except KeyboardInterrupt:
     pass
 finally:
-    time.sleep(2)
     daq.stop()
+    winsound.Beep(750, 2000)
+    print('DAQ halted')

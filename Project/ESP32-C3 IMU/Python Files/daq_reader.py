@@ -2,7 +2,6 @@ import threading
 import serial
 import struct
 import time
-import winsound
 from collections import deque
 
 H1 = 0xAA
@@ -41,7 +40,6 @@ class DAQReader:
             except (serial.SerialException, OSError, IndexError, struct.error):
                 self._running = False
                 print("Serial disconnected")
-                winsound.Beep(1000, 2000)
                 break
             self.sample_times.append(time.perf_counter())
             if self._data_callback:
