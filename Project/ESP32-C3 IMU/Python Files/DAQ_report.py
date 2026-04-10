@@ -102,6 +102,7 @@ def _report_duplicate_counts(records):
 	for subject, arm, label in sorted(counts):
 		label_text = f'reps={label}'
 		print(f'{subject:<{subject_width}}, {arm:<{arm_width}}, {label_text:>{label_width}}: {counts[(subject, arm, label)]}')
+	print(f'\nTotal: {sum(counts.values())}')
 
 
 def main():
