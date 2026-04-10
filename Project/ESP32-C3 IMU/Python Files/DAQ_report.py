@@ -2,7 +2,7 @@ from collections import Counter
 import csv
 from pathlib import Path
 
-FOLDER = 'recordings/debugging'
+FOLDER = 'recordings/training1'
 RECORDINGS_DIR = Path(__file__).resolve().parent / FOLDER
 LOW_HZ_THRESHOLD = 99.0
 MIN_TIME_SECONDS = 2.0
