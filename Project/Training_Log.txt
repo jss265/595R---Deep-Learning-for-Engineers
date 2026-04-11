@@ -1,0 +1,7 @@
+3:04 - Non-normalized data, 40 epochs
+    Epoch [40/40] | Train Loss: 1.2330 | Train Acc: 46.27% | Test Loss: 1.4463 | Test Acc: 29.41%
+    Epoch [40/40] | Train Loss: 1.2024 | Train Acc: 46.64% | Test Loss: 1.3899 | Test Acc: 36.76%
+3:11 - Non-normalized data, 100 epochs
+    Epoch [100/100] | Train Loss: 1.0936 | Train Acc: 58.58% | Test Loss: 1.3392 | Test Acc: 44.12%
+3:13 - Non-normalized data, 1000 epochs
+    

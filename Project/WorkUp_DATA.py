@@ -3,6 +3,7 @@ import pandas as pd
 import glob
 import os
 from torch.utils.data import Dataset
+from torch.nn.utils.rnn import pad_sequence
 
 class IMURepDataset(Dataset):
     def __init__(self, data_dir):
@@ -37,3 +38,22 @@ class IMURepDataset(Dataset):
         # Returns the pre-parsed sequence and label for the given index when instance[] is called
         # Now this is lighting fast! Just returning from RAM.
         return self.sequences[idx], self.labels[idx]
+
+def pad_collate(batch):
+    """
+    Custom collate function to handle variable-length IMU sequences.
+    To be passed to the DataLoader: `DataLoader(..., collate_fn=pad_collate)`
+    """
+    # 'batch' is a list of tuples from __getitem__: [(seq1, label1), (seq2, label2), ...]
+    sequences = [item[0] for item in batch]
+    labels = [item[1] for item in batch]
+    labels = torch.stack(labels) # Convert list of labels to a tensor
+    
+    # Record the original lengths of each sequence before padding
+    lengths = torch.tensor([len(seq) for seq in sequences], dtype=torch.long)
+    
+    # Pad the sequences. batch_first=True -> (batch_size, max_len, features)
+    sequences_padded = pad_sequence(sequences, batch_first=True, padding_value=0.0)
+    
+    
+    return sequences_padded, labels, lengths
