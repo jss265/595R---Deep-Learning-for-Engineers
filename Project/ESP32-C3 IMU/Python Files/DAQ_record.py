@@ -20,8 +20,9 @@ def begin_test():
         'Dean Black',
         'Brennan Johnson',
         'Reese Hammons',
+        'Peter Cope'
         'Still with noise',
-        'Two-hands and jerked'
+        'Two-hands and jerked',
         ]
 
     arms = [
