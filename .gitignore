@@ -1,5 +1,5 @@
 
 *.png
 *_Dr.Ning_*
-**/recordings/
+# **/recordings/
 
