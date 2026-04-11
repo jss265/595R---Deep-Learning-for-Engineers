@@ -3,9 +3,10 @@
 To break past the 50% accuracy plateau, we will smooth the noisy IMU inputs, give the network more capacity to learn complex temporal patterns, and tackle any class imbalances.
 
 **Steps**
-1. Update data loader to apply a rolling average (window=5) to IMU features before normalization.
-2. Upgrade the GRU model by expanding hidden nodes, adding a second layer, and replacing the final linear layer with an MLP classification head.
-3. Calculate class frequencies across the dataset and apply inverse weights to the Cross Entropy Loss objective in training.
+1. Convert the files and workflow to run in Google Colab so GPU training can be used and runs much faster.
+2. Update data loader to apply a rolling average (window=5) to IMU features before normalization.
+3. Upgrade the GRU model by expanding hidden nodes, adding a second layer, and replacing the final linear layer with an MLP classification head.
+4. Calculate class frequencies across the dataset and apply inverse weights to the Cross Entropy Loss objective in training.
 
 **Relevant files**
 - Project/WorkUp_DATA.py — Add rolling mean in the CSV parsing loop.
