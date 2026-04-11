@@ -4,4 +4,6 @@
 3:11 - Non-normalized data, 100 epochs
     Epoch [100/100] | Train Loss: 1.0936 | Train Acc: 58.58% | Test Loss: 1.3392 | Test Acc: 44.12%
 3:13 - Non-normalized data, 1000 epochs
+    Epoch [1000/1000] | Train Loss: 0.9658 | Train Acc: 64.18% | Test Loss: 1.5826 | Test Acc: 36.76%
+3:42 - Normalized data, 100 epochs
     

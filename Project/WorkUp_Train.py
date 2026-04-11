@@ -36,7 +36,7 @@ def train_and_eval():
     loss_fn = nn.CrossEntropyLoss() # aka criterion
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    epochs = 1000
+    epochs = 100
     print("\nStarting Training...\n" + "-"*50)
 
     # 6. The Training Loop
