@@ -36,7 +36,7 @@ def train_and_eval(lists):
     loss_fn = nn.CrossEntropyLoss() # aka criterion
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    epochs = 40
+    epochs = 50
     print("\nStarting Training...\n" + "-"*50)
 
     # 6. The Training Loop
@@ -88,7 +88,7 @@ def train_and_eval(lists):
         avg_train_loss = total_train_loss / len(train_loader)
         avg_test_loss = total_test_loss / len(test_loader)
 
-        if (epoch + 1) % 5 == 0 or epoch == 0:
+        if (epoch + 1) % 10 == 0 or epoch == 0:
             print(f"Epoch [{epoch+1:2d}/{epochs}] "
                   f"| Train Loss: {avg_train_loss:.4f} | Train Acc: {train_acc:5.2f}% "
                   f"| Test Loss: {avg_test_loss:.4f} | Test Acc: {test_acc:5.2f}%")

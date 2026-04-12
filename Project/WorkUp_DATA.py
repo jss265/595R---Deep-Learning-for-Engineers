@@ -27,13 +27,12 @@ class IMURepDataset(Dataset):
             
             # Filter by acceptable subject, arm, and reps
             subject = str(meta_df.loc['subject', 1]).strip()
-            arm = str(meta_df.loc['arm', 1]).strip()
-            reps = str(meta_df.loc['reps', 1]).strip()
+            arm = str(meta_df.loc['arm', 1]).strip().lower()
+            label_val = int(meta_df.loc['label', 1])
             
-            if subject not in valid_subjects or arm not in valid_arms or reps not in valid_reps:
+            if subject not in valid_subjects or arm not in valid_arms or label_val not in valid_reps:
                 continue
 
-            label_val = int(meta_df.loc['label', 1])
             self.labels.append(torch.tensor(label_val, dtype=torch.long))
             
             # 2. Parse Actual Data
@@ -57,7 +56,6 @@ class IMURepDataset(Dataset):
         # 3. Apply the global mean and std to standardize every individual sequence in the dataset
         for i in range(len(self.sequences)):
             self.sequences[i] = (self.sequences[i] - self.mean) / self.std
-        input('pause')
 
 
     def __len__(self):
