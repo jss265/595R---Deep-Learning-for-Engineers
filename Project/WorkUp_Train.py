@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader, random_split
 from WorkUp_DATA import IMURepDataset, pad_collate
 from WorkUp_GRU import RNNPredictor
 
-def train_and_eval():
+def train_and_eval(lists):
     # 1. Setup Device (MPS for Mac, CUDA for Nvidia, otherwise CPU)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
@@ -16,7 +16,7 @@ def train_and_eval():
     # 2. Load the Dataset
     data_dir = os.path.join(os.path.dirname(__file__), "ESP32-C3 IMU", "Python Files", "recordings", "training1")
     print(f"Loading dataset from: {data_dir}")
-    full_dataset = IMURepDataset(data_dir)
+    full_dataset = IMURepDataset(data_dir, *lists)
     print(f"Total labeled sequences loaded: {len(full_dataset)}")
 
     # 3. Split the Data (80% Training, 20% Testing)

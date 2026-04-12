@@ -6,10 +6,13 @@ from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
 
 class IMURepDataset(Dataset):
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, valid_subjects, valid_arms, valid_reps):
         """
         Args:
             data_dir (str): Path to the folder containing the CSVs.
+            valid_subjects (list of str): Acceptable subjects.
+            valid_arms (list of str): Acceptable arms.
+            valid_reps (list of str): Acceptable reps.
         """
         file_paths = glob.glob(os.path.join(data_dir, "*.csv"))
         
@@ -21,6 +24,15 @@ class IMURepDataset(Dataset):
         for file_path in file_paths:
             # 1. Parse Metadata
             meta_df = pd.read_csv(file_path, nrows=5, header=None, index_col=0)
+            
+            # Filter by acceptable subject, arm, and reps
+            subject = str(meta_df.loc['subject', 1]).strip()
+            arm = str(meta_df.loc['arm', 1]).strip()
+            reps = str(meta_df.loc['reps', 1]).strip()
+            
+            if subject not in valid_subjects or arm not in valid_arms or reps not in valid_reps:
+                continue
+
             label_val = int(meta_df.loc['label', 1])
             self.labels.append(torch.tensor(label_val, dtype=torch.long))
             
@@ -45,6 +57,7 @@ class IMURepDataset(Dataset):
         # 3. Apply the global mean and std to standardize every individual sequence in the dataset
         for i in range(len(self.sequences)):
             self.sequences[i] = (self.sequences[i] - self.mean) / self.std
+        input('pause')
 
 
     def __len__(self):
