@@ -54,6 +54,9 @@ def scheduler():
              [E,EE],
              [F,FF],
              [G,GG]]
+    
+    WorkUp_Train.train_and_eval(A,AA)
+    return 
     for list, string in lists:
         string = 'TRAINING: ' + string
         print("\n" + "="*50 + "\n" + string + "\n" + "="*50)

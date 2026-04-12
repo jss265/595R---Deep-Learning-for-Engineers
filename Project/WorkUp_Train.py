@@ -8,7 +8,18 @@ from torch.utils.data import DataLoader, random_split
 from WorkUp_DATA import IMURepDataset, pad_collate
 from WorkUp_GRU import RNNPredictor
 
-def train_and_eval(lists):
+HP = {
+    'input_size': 10,
+    'hidden_size': 32,
+    'num_classes': 4,
+    'batch_size': 32,
+    'epochs': 50,
+    'lr': 0.001,
+    'optim': optim.Adam,
+    'loss_fn': nn.CrossEntropyLoss
+}
+
+def train_and_eval(lists, list_name=""):
     # 1. Setup Device (MPS for Mac, CUDA for Nvidia, otherwise CPU)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
@@ -25,22 +36,20 @@ def train_and_eval(lists):
     train_dataset, test_dataset = random_split(full_dataset, [train_size, test_size])
 
     # 4. Create DataLoaders (using our custom collate_fn for the padding)
-    batch_size = 32
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=pad_collate)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, collate_fn=pad_collate)
+    train_loader = DataLoader(train_dataset, batch_size=HP['batch_size'], shuffle=True, collate_fn=pad_collate)
+    test_loader = DataLoader(test_dataset, batch_size=HP['batch_size'], shuffle=False, collate_fn=pad_collate)
 
     # 5. Initialize the Model, Loss Function, and Optimizer
-    model = RNNPredictor(input_size=10, hidden_size=32, num_classes=4).to(device)
+    model = RNNPredictor(input_size=HP['input_size'], hidden_size=HP['hidden_size'], num_classes=HP['num_classes']).to(device)
     
     # CrossEntropyLoss expects discrete integer targets and raw unnormalized logits (this is AI jargon, but it works hehe)
-    loss_fn = nn.CrossEntropyLoss() # aka criterion
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    loss_fn = HP['loss_fn']() # aka criterion
+    optimizer = HP['optim'](model.parameters(), lr=HP['lr'])
 
-    epochs = 50
-    print("\nStarting Training...\n" + "-"*50)
+    print(f"\nStarting Training... {list_name}\n" + "-"*50)
 
     # 6. The Training Loop
-    for epoch in range(epochs):
+    for epoch in range(HP['epochs']):
         model.train()
         total_train_loss = 0
         correct_train = 0
