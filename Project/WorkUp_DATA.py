@@ -19,22 +19,22 @@ class IMURepDataset(Dataset):
         
         # Parse all files ONCE during initialization
         for file_path in file_paths:
-            # 1. Parse Metadata
+            # Parse Metadata
             meta_df = pd.read_csv(file_path, nrows=5, header=None, index_col=0)
             label_val = int(meta_df.loc['label', 1])
             self.labels.append(torch.tensor(label_val, dtype=torch.long))
             
-            # 2. Parse Actual Data
+            # Parse Actual Data
             data_df = pd.read_csv(file_path, skiprows=6)
             features = data_df[['q0', 'q1', 'q2', 'q3', 'ax', 'ay', 'az', 'gx', 'gy', 'gz']].values
             
             self.sequences.append(torch.tensor(features, dtype=torch.float32))
 
-        # --- GLOBAL Z-SCORE NORMALIZATION ---
-        # 1. Stack all sequences together into one giant tensor along the time dimension
+        # GLOBAL Z-SCORE NORMALIZATION
+        # Stack all sequences together into one giant tensor along the time dimension
         all_data = torch.cat(self.sequences, dim=0)
 
-        # 2. Calculate the global mean and standard deviation for each of the 10 features
+        # Calculate the global mean and standard deviation for each of the 10 features
         # Keep dim=0 because we are flattening time and files, keeping only the 10 features
         self.mean = all_data.mean(dim=0)
         self.std = all_data.std(dim=0)
@@ -42,7 +42,7 @@ class IMURepDataset(Dataset):
         # Prevent division by zero if a feature is completely constant
         self.std[self.std == 0] = 1.0
 
-        # 3. Apply the global mean and std to standardize every individual sequence in the dataset
+        # Apply the global mean and std to standardize every individual sequence in the dataset
         for i in range(len(self.sequences)):
             self.sequences[i] = (self.sequences[i] - self.mean) / self.std
 
