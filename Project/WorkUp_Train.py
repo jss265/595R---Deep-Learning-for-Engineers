@@ -88,7 +88,8 @@ def train_stage(model, train_loader, test_loader, device, epochs, lr, stage_name
         train_acc = 100.0 * correct_train / max(total_train_samples, 1)
         avg_test_loss, test_acc = evaluate(model, test_loader, loss_fn, device)
 
-        if epoch == 0 or (epoch + 1) % 25 == 0 or epoch + 1 == epochs:
+        interval = int(epochs/4)
+        if epoch == 0 or (epoch + 1) % interval == 0 or epoch + 1 == epochs:
             print(
                 f"Epoch [{epoch + 1:3d}/{epochs}] "
                 f"| Train Loss: {avg_train_loss:.4f} | Train Acc: {train_acc:5.2f}% "
@@ -113,8 +114,8 @@ def train_and_eval(valid_subjects, valid_arms, valid_reps):
 
     stages = [
         {"name": "Stage 1: reps 0, 1", "allowed_labels": [0, 1], "epochs": 150, "lr": 1e-3},
-        {"name": "Stage 2: reps 0, 1, 2", "allowed_labels": [0, 1, 2], "epochs": 325, "lr": 5e-4},
-        {"name": "Stage 3: reps 0, 1, 2, 3", "allowed_labels": [0, 1, 2, 3], "epochs": 750, "lr": 1e-4},
+        {"name": "Stage 2: reps 0, 1, 2", "allowed_labels": [0, 1, 2], "epochs": 2500, "lr": 5e-4},
+        {"name": "Stage 3: reps 0, 1, 2, 3", "allowed_labels": [0, 1, 2, 3], "epochs": 100000, "lr": 1e-4},
     ]
 
     print("\nStarting Curriculum Training...\n" + "-" * 50)
