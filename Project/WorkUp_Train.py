@@ -95,13 +95,13 @@ def train_stage(model, train_loader, test_loader, device, epochs, lr, stage_name
                 f"| Test Loss: {avg_test_loss:.4f} | Test Acc: {test_acc:5.2f}%"
             )
 
-def train_and_eval():
+def train_and_eval(valid_subjects, valid_arms, valid_reps):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
 
     data_dir = os.path.join(os.path.dirname(__file__), "ESP32-C3 IMU", "Python Files", "recordings", "training1")
     print(f"Loading dataset from: {data_dir}")
-    full_dataset = IMURepDataset(data_dir)
+    full_dataset = IMURepDataset(data_dir, valid_subjects, valid_arms, valid_reps)
     print(f"Total labeled sequences loaded: {len(full_dataset)}")
 
     train_dataset, test_dataset = stratified_split(full_dataset)
