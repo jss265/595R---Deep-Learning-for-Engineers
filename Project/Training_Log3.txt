@@ -1,0 +1,597 @@
+Day One | Colab Cuda   
+    GitHub 8daaa46a6d10a1d7df5b55ca6a992c03e4af9b6f | "Small tweaks"
+    DONE WITH STAGES:
+        stages = [
+            {"name": "Stage 1: reps 0, 1", "allowed_labels": [0, 1], "epochs": 150, "lr": 1e-3},
+            {"name": "Stage 2: reps 0, 1, 2", "allowed_labels": [0, 1, 2], "epochs": 2500, "lr": 5e-4},
+            {"name": "Stage 3: reps 0, 1, 2, 3", "allowed_labels": [0, 1, 2, 3], "epochs": 100000, "lr": 1e-4},
+        ]
+
+==================================================
+TRAINING: all
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 336
+Train split size: 267
+Test split size: 69
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 153 | Test samples: 39
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.4240 | Train Acc: 13.07% | Test Loss: 1.3722 | Test Acc: 20.51%
+Epoch [ 37/150] | Train Loss: 0.6535 | Train Acc: 63.40% | Test Loss: 0.8068 | Test Acc: 61.54%
+Epoch [ 74/150] | Train Loss: 0.5677 | Train Acc: 66.67% | Test Loss: 0.7956 | Test Acc: 58.97%
+Epoch [111/150] | Train Loss: 0.0983 | Train Acc: 98.04% | Test Loss: 0.7178 | Test Acc: 74.36%
+Epoch [148/150] | Train Loss: 0.0272 | Train Acc: 100.00% | Test Loss: 0.1941 | Test Acc: 89.74%
+Epoch [150/150] | Train Loss: 0.0240 | Train Acc: 100.00% | Test Loss: 0.1932 | Test Acc: 89.74%
+Stage 2: reps 0, 1, 2 | Train samples: 210 | Test samples: 54
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 1.7846 | Train Acc: 72.86% | Test Loss: 2.4090 | Test Acc: 64.81%
+Epoch [875/3500] | Train Loss: 0.2810 | Train Acc: 85.24% | Test Loss: 0.8671 | Test Acc: 62.96%
+Epoch [1750/3500] | Train Loss: 0.0008 | Train Acc: 100.00% | Test Loss: 2.3461 | Test Acc: 68.52%
+Epoch [2625/3500] | Train Loss: 0.0003 | Train Acc: 100.00% | Test Loss: 2.0453 | Test Acc: 75.93%
+Epoch [3500/3500] | Train Loss: 0.0004 | Train Acc: 100.00% | Test Loss: 2.3229 | Test Acc: 72.22%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 267 | Test samples: 69
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 3.9155 | Train Acc: 78.65% | Test Loss: 8.9003 | Test Acc: 57.97%
+Epoch [1875/7500] | Train Loss: 0.0792 | Train Acc: 98.88% | Test Loss: 3.8039 | Test Acc: 56.52%
+Epoch [3750/7500] | Train Loss: 0.0037 | Train Acc: 100.00% | Test Loss: 5.2236 | Test Acc: 59.42%
+Epoch [5625/7500] | Train Loss: 0.0005 | Train Acc: 100.00% | Test Loss: 5.4924 | Test Acc: 55.07%
+Epoch [7500/7500] | Train Loss: 0.0004 | Train Acc: 100.00% | Test Loss: 5.1120 | Test Acc: 57.97%
+
+Done Training.
+
+==================================================
+TRAINING: all but still/jerked cases
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 288
+Train split size: 228
+Test split size: 60
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 114 | Test samples: 30
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.3376 | Train Acc: 29.82% | Test Loss: 1.3398 | Test Acc: 33.33%
+Epoch [ 37/150] | Train Loss: 0.6688 | Train Acc: 64.04% | Test Loss: 0.7674 | Test Acc: 46.67%
+Epoch [ 74/150] | Train Loss: 0.5813 | Train Acc: 69.30% | Test Loss: 0.8501 | Test Acc: 50.00%
+Epoch [111/150] | Train Loss: 0.0834 | Train Acc: 98.25% | Test Loss: 0.6221 | Test Acc: 83.33%
+Epoch [148/150] | Train Loss: 0.0358 | Train Acc: 99.12% | Test Loss: 0.6216 | Test Acc: 83.33%
+Epoch [150/150] | Train Loss: 0.0345 | Train Acc: 99.12% | Test Loss: 0.6210 | Test Acc: 83.33%
+Stage 2: reps 0, 1, 2 | Train samples: 171 | Test samples: 45
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 2.5428 | Train Acc: 65.50% | Test Loss: 4.0458 | Test Acc: 55.56%
+Epoch [875/3500] | Train Loss: 0.0031 | Train Acc: 100.00% | Test Loss: 1.5767 | Test Acc: 73.33%
+Epoch [1750/3500] | Train Loss: 0.0003 | Train Acc: 100.00% | Test Loss: 2.2436 | Test Acc: 75.56%
+Epoch [2625/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 2.9041 | Test Acc: 75.56%
+Epoch [3500/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 3.5765 | Test Acc: 75.56%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 228 | Test samples: 60
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 4.8517 | Train Acc: 75.00% | Test Loss: 7.7582 | Test Acc: 58.33%
+Epoch [1875/7500] | Train Loss: 0.3059 | Train Acc: 86.40% | Test Loss: 2.1762 | Test Acc: 70.00%
+Epoch [3750/7500] | Train Loss: 0.1714 | Train Acc: 95.61% | Test Loss: 2.4235 | Test Acc: 63.33%
+Epoch [5625/7500] | Train Loss: 0.0446 | Train Acc: 98.68% | Test Loss: 1.6399 | Test Acc: 66.67%
+Epoch [7500/7500] | Train Loss: 0.0064 | Train Acc: 100.00% | Test Loss: 2.0243 | Test Acc: 66.67%
+
+Done Training.
+
+==================================================
+TRAINING: all 0,1 reps
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 192
+Train split size: 153
+Test split size: 39
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 153 | Test samples: 39
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.4566 | Train Acc: 12.42% | Test Loss: 1.4111 | Test Acc: 17.95%
+Epoch [ 37/150] | Train Loss: 0.6548 | Train Acc: 62.75% | Test Loss: 0.8125 | Test Acc: 61.54%
+Epoch [ 74/150] | Train Loss: 0.0742 | Train Acc: 98.69% | Test Loss: 0.1018 | Test Acc: 97.44%
+Epoch [111/150] | Train Loss: 0.0065 | Train Acc: 100.00% | Test Loss: 0.0885 | Test Acc: 97.44%
+Epoch [148/150] | Train Loss: 0.0031 | Train Acc: 100.00% | Test Loss: 0.0977 | Test Acc: 97.44%
+Epoch [150/150] | Train Loss: 0.0030 | Train Acc: 100.00% | Test Loss: 0.0982 | Test Acc: 97.44%
+Stage 2: reps 0, 1, 2 | Train samples: 153 | Test samples: 39
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 0.0109 | Train Acc: 99.35% | Test Loss: 0.1000 | Test Acc: 97.44%
+Epoch [875/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.1832 | Test Acc: 97.44%
+Epoch [1750/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.2204 | Test Acc: 97.44%
+Epoch [2625/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.2548 | Test Acc: 97.44%
+Epoch [3500/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.2856 | Test Acc: 97.44%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 153 | Test samples: 39
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.2857 | Test Acc: 97.44%
+Epoch [1875/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.3225 | Test Acc: 97.44%
+Epoch [3750/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.3323 | Test Acc: 97.44%
+Epoch [5625/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.3381 | Test Acc: 97.44%
+Epoch [7500/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.3420 | Test Acc: 97.44%
+
+Done Training.
+
+==================================================
+TRAINING: all 0,1 reps except still/jerked cases
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 144
+Train split size: 114
+Test split size: 30
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 114 | Test samples: 30
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.3441 | Train Acc: 29.82% | Test Loss: 1.3132 | Test Acc: 36.67%
+Epoch [ 37/150] | Train Loss: 0.6902 | Train Acc: 60.53% | Test Loss: 0.7046 | Test Acc: 50.00%
+Epoch [ 74/150] | Train Loss: 0.1091 | Train Acc: 100.00% | Test Loss: 0.1379 | Test Acc: 96.67%
+Epoch [111/150] | Train Loss: 0.0102 | Train Acc: 100.00% | Test Loss: 0.1612 | Test Acc: 96.67%
+Epoch [148/150] | Train Loss: 0.0051 | Train Acc: 100.00% | Test Loss: 0.1797 | Test Acc: 96.67%
+Epoch [150/150] | Train Loss: 0.0050 | Train Acc: 100.00% | Test Loss: 0.1807 | Test Acc: 96.67%
+Stage 2: reps 0, 1, 2 | Train samples: 114 | Test samples: 30
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 0.0048 | Train Acc: 100.00% | Test Loss: 0.1846 | Test Acc: 96.67%
+Epoch [875/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.8099 | Test Acc: 93.33%
+Epoch [1750/3500] | Train Loss: 0.0049 | Train Acc: 100.00% | Test Loss: 0.2055 | Test Acc: 93.33%
+Epoch [2625/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.5294 | Test Acc: 93.33%
+Epoch [3500/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.5806 | Test Acc: 93.33%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 114 | Test samples: 30
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 0.0033 | Train Acc: 100.00% | Test Loss: 0.5835 | Test Acc: 93.33%
+Epoch [1875/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.7305 | Test Acc: 93.33%
+Epoch [3750/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.9310 | Test Acc: 93.33%
+Epoch [5625/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.0686 | Test Acc: 93.33%
+Epoch [7500/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.1608 | Test Acc: 93.33%
+
+Done Training.
+
+==================================================
+TRAINING: only mine
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 176
+Train split size: 139
+Test split size: 37
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 89 | Test samples: 23
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.2689 | Train Acc: 60.67% | Test Loss: 1.2590 | Test Acc: 60.87%
+Epoch [ 37/150] | Train Loss: 0.5632 | Train Acc: 71.91% | Test Loss: 0.6928 | Test Acc: 69.57%
+Epoch [ 74/150] | Train Loss: 0.4887 | Train Acc: 75.28% | Test Loss: 0.8628 | Test Acc: 60.87%
+Epoch [111/150] | Train Loss: 0.2042 | Train Acc: 92.13% | Test Loss: 1.0396 | Test Acc: 65.22%
+Epoch [148/150] | Train Loss: 0.0661 | Train Acc: 98.88% | Test Loss: 1.0218 | Test Acc: 73.91%
+Epoch [150/150] | Train Loss: 0.0653 | Train Acc: 98.88% | Test Loss: 1.2300 | Test Acc: 69.57%
+Stage 2: reps 0, 1, 2 | Train samples: 114 | Test samples: 30
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 1.3261 | Train Acc: 77.19% | Test Loss: 2.2257 | Test Acc: 53.33%
+Epoch [875/3500] | Train Loss: 0.1483 | Train Acc: 95.61% | Test Loss: 2.4681 | Test Acc: 53.33%
+Epoch [1750/3500] | Train Loss: 0.3514 | Train Acc: 92.11% | Test Loss: 3.0635 | Test Acc: 50.00%
+Epoch [2625/3500] | Train Loss: 0.2163 | Train Acc: 92.11% | Test Loss: 1.8609 | Test Acc: 63.33%
+Epoch [3500/3500] | Train Loss: 0.0503 | Train Acc: 97.37% | Test Loss: 3.0247 | Test Acc: 63.33%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 139 | Test samples: 37
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 3.2364 | Train Acc: 79.86% | Test Loss: 9.5022 | Test Acc: 48.65%
+Epoch [1875/7500] | Train Loss: 0.2005 | Train Acc: 94.96% | Test Loss: 2.5467 | Test Acc: 35.14%
+Epoch [3750/7500] | Train Loss: 0.1182 | Train Acc: 96.40% | Test Loss: 2.1553 | Test Acc: 40.54%
+Epoch [5625/7500] | Train Loss: 0.0170 | Train Acc: 100.00% | Test Loss: 3.1480 | Test Acc: 45.95%
+Epoch [7500/7500] | Train Loss: 0.0046 | Train Acc: 100.00% | Test Loss: 3.4692 | Test Acc: 40.54%
+
+Done Training.
+
+==================================================
+TRAINING: only mine except still/jerked cases
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 128
+Train split size: 100
+Test split size: 28
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 50 | Test samples: 14
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.3031 | Train Acc: 44.00% | Test Loss: 1.3104 | Test Acc: 50.00%
+Epoch [ 37/150] | Train Loss: 0.7005 | Train Acc: 62.00% | Test Loss: 0.6898 | Test Acc: 78.57%
+Epoch [ 74/150] | Train Loss: 0.6604 | Train Acc: 70.00% | Test Loss: 0.6395 | Test Acc: 78.57%
+Epoch [111/150] | Train Loss: 0.5192 | Train Acc: 76.00% | Test Loss: 0.5382 | Test Acc: 78.57%
+Epoch [148/150] | Train Loss: 0.1248 | Train Acc: 98.00% | Test Loss: 0.8066 | Test Acc: 78.57%
+Epoch [150/150] | Train Loss: 0.1252 | Train Acc: 98.00% | Test Loss: 0.8053 | Test Acc: 78.57%
+Stage 2: reps 0, 1, 2 | Train samples: 75 | Test samples: 21
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 2.0899 | Train Acc: 65.33% | Test Loss: 2.4185 | Test Acc: 52.38%
+Epoch [875/3500] | Train Loss: 0.5348 | Train Acc: 81.33% | Test Loss: 1.3032 | Test Acc: 42.86%
+Epoch [1750/3500] | Train Loss: 0.1559 | Train Acc: 97.33% | Test Loss: 2.6309 | Test Acc: 38.10%
+Epoch [2625/3500] | Train Loss: 0.0372 | Train Acc: 100.00% | Test Loss: 3.5380 | Test Acc: 42.86%
+Epoch [3500/3500] | Train Loss: 0.0121 | Train Acc: 100.00% | Test Loss: 3.6704 | Test Acc: 42.86%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 100 | Test samples: 28
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 3.1933 | Train Acc: 75.00% | Test Loss: 5.3938 | Test Acc: 32.14%
+Epoch [1875/7500] | Train Loss: 0.0430 | Train Acc: 100.00% | Test Loss: 3.0121 | Test Acc: 39.29%
+Epoch [3750/7500] | Train Loss: 0.1098 | Train Acc: 95.00% | Test Loss: 3.5953 | Test Acc: 39.29%
+Epoch [5625/7500] | Train Loss: 0.0043 | Train Acc: 100.00% | Test Loss: 3.9762 | Test Acc: 39.29%
+Epoch [7500/7500] | Train Loss: 0.0017 | Train Acc: 100.00% | Test Loss: 4.7778 | Test Acc: 39.29%
+
+Done Training.
+
+==================================================
+TRAINING: only my 0,1 reps
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 64
+Train split size: 50
+Test split size: 14
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 50 | Test samples: 14
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.3227 | Train Acc: 36.00% | Test Loss: 1.3087 | Test Acc: 50.00%
+Epoch [ 37/150] | Train Loss: 0.6905 | Train Acc: 64.00% | Test Loss: 0.7280 | Test Acc: 42.86%
+Epoch [ 74/150] | Train Loss: 0.6323 | Train Acc: 62.00% | Test Loss: 0.6202 | Test Acc: 64.29%
+Epoch [111/150] | Train Loss: 0.5347 | Train Acc: 68.00% | Test Loss: 0.5284 | Test Acc: 71.43%
+Epoch [148/150] | Train Loss: 0.3120 | Train Acc: 84.00% | Test Loss: 0.7826 | Test Acc: 57.14%
+Epoch [150/150] | Train Loss: 0.2860 | Train Acc: 88.00% | Test Loss: 0.8165 | Test Acc: 57.14%
+Stage 2: reps 0, 1, 2 | Train samples: 50 | Test samples: 14
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 0.3224 | Train Acc: 86.00% | Test Loss: 0.8312 | Test Acc: 57.14%
+Epoch [875/3500] | Train Loss: 0.0005 | Train Acc: 100.00% | Test Loss: 1.8184 | Test Acc: 71.43%
+Epoch [1750/3500] | Train Loss: 0.0001 | Train Acc: 100.00% | Test Loss: 1.7610 | Test Acc: 71.43%
+Epoch [2625/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.9011 | Test Acc: 78.57%
+Epoch [3500/3500] | Train Loss: 0.0002 | Train Acc: 100.00% | Test Loss: 2.3870 | Test Acc: 71.43%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 50 | Test samples: 14
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 0.0002 | Train Acc: 100.00% | Test Loss: 2.3902 | Test Acc: 71.43%
+Epoch [1875/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.7396 | Test Acc: 85.71%
+Epoch [3750/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.8309 | Test Acc: 85.71%
+Epoch [5625/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 2.0115 | Test Acc: 85.71%
+Epoch [7500/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.1826 | Test Acc: 92.86%
+
+Done Training.
+
+==================================================
+TRAINING: all
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 336
+Train split size: 267
+Test split size: 69
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 153 | Test samples: 39
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.2515 | Train Acc: 49.67% | Test Loss: 1.2193 | Test Acc: 56.41%
+Epoch [ 37/150] | Train Loss: 0.6447 | Train Acc: 64.71% | Test Loss: 0.8011 | Test Acc: 58.97%
+Epoch [ 74/150] | Train Loss: 0.1167 | Train Acc: 97.39% | Test Loss: 0.7114 | Test Acc: 84.62%
+Epoch [111/150] | Train Loss: 0.0204 | Train Acc: 100.00% | Test Loss: 0.1353 | Test Acc: 94.87%
+Epoch [148/150] | Train Loss: 0.0057 | Train Acc: 100.00% | Test Loss: 0.1603 | Test Acc: 94.87%
+Epoch [150/150] | Train Loss: 0.0055 | Train Acc: 100.00% | Test Loss: 0.1614 | Test Acc: 94.87%
+Stage 2: reps 0, 1, 2 | Train samples: 210 | Test samples: 54
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 1.9305 | Train Acc: 72.86% | Test Loss: 2.5453 | Test Acc: 66.67%
+Epoch [875/3500] | Train Loss: 0.0226 | Train Acc: 99.52% | Test Loss: 1.4444 | Test Acc: 74.07%
+Epoch [1750/3500] | Train Loss: 0.0005 | Train Acc: 100.00% | Test Loss: 1.7194 | Test Acc: 79.63%
+Epoch [2625/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 2.6016 | Test Acc: 79.63%
+Epoch [3500/3500] | Train Loss: 0.0001 | Train Acc: 100.00% | Test Loss: 0.9118 | Test Acc: 92.59%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 267 | Test samples: 69
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 3.9822 | Train Acc: 78.65% | Test Loss: 9.2263 | Test Acc: 69.57%
+Epoch [1875/7500] | Train Loss: 0.1168 | Train Acc: 96.63% | Test Loss: 1.4670 | Test Acc: 69.57%
+Epoch [3750/7500] | Train Loss: 0.0208 | Train Acc: 99.63% | Test Loss: 1.9454 | Test Acc: 69.57%
+Epoch [5625/7500] | Train Loss: 0.0046 | Train Acc: 100.00% | Test Loss: 2.7546 | Test Acc: 65.22%
+Epoch [7500/7500] | Train Loss: 0.0004 | Train Acc: 100.00% | Test Loss: 3.8918 | Test Acc: 66.67%
+
+Done Training.
+
+==================================================
+TRAINING: all but still/jerked cases
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 288
+Train split size: 228
+Test split size: 60
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 114 | Test samples: 30
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.5264 | Train Acc:  7.02% | Test Loss: 1.5312 | Test Acc:  6.67%
+Epoch [ 37/150] | Train Loss: 0.6785 | Train Acc: 62.28% | Test Loss: 0.7728 | Test Acc: 40.00%
+Epoch [ 74/150] | Train Loss: 0.6246 | Train Acc: 66.67% | Test Loss: 0.7719 | Test Acc: 46.67%
+Epoch [111/150] | Train Loss: 0.0630 | Train Acc: 99.12% | Test Loss: 0.1806 | Test Acc: 93.33%
+Epoch [148/150] | Train Loss: 0.0817 | Train Acc: 97.37% | Test Loss: 0.1902 | Test Acc: 93.33%
+Epoch [150/150] | Train Loss: 0.0778 | Train Acc: 97.37% | Test Loss: 0.1814 | Test Acc: 93.33%
+Stage 2: reps 0, 1, 2 | Train samples: 171 | Test samples: 45
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 2.7287 | Train Acc: 64.91% | Test Loss: 4.3178 | Test Acc: 62.22%
+Epoch [875/3500] | Train Loss: 0.0013 | Train Acc: 100.00% | Test Loss: 0.4812 | Test Acc: 88.89%
+Epoch [1750/3500] | Train Loss: 0.0003 | Train Acc: 100.00% | Test Loss: 0.2151 | Test Acc: 95.56%
+Epoch [2625/3500] | Train Loss: 0.0006 | Train Acc: 100.00% | Test Loss: 0.3536 | Test Acc: 91.11%
+Epoch [3500/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.4963 | Test Acc: 88.89%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 228 | Test samples: 60
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 4.9422 | Train Acc: 75.00% | Test Loss: 5.6871 | Test Acc: 66.67%
+Epoch [1875/7500] | Train Loss: 0.1702 | Train Acc: 92.11% | Test Loss: 1.1484 | Test Acc: 75.00%
+Epoch [3750/7500] | Train Loss: 0.0527 | Train Acc: 98.68% | Test Loss: 1.5769 | Test Acc: 66.67%
+Epoch [5625/7500] | Train Loss: 0.0224 | Train Acc: 99.12% | Test Loss: 2.0584 | Test Acc: 60.00%
+Epoch [7500/7500] | Train Loss: 0.0704 | Train Acc: 97.37% | Test Loss: 1.4968 | Test Acc: 71.67%
+
+Done Training.
+
+==================================================
+TRAINING: all 0,1 reps
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 192
+Train split size: 153
+Test split size: 39
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 153 | Test samples: 39
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.3380 | Train Acc: 32.68% | Test Loss: 1.2688 | Test Acc: 48.72%
+Epoch [ 37/150] | Train Loss: 0.6359 | Train Acc: 67.97% | Test Loss: 0.8193 | Test Acc: 64.10%
+Epoch [ 74/150] | Train Loss: 0.0692 | Train Acc: 98.69% | Test Loss: 0.4073 | Test Acc: 94.87%
+Epoch [111/150] | Train Loss: 0.0656 | Train Acc: 98.69% | Test Loss: 0.4505 | Test Acc: 92.31%
+Epoch [148/150] | Train Loss: 0.0059 | Train Acc: 100.00% | Test Loss: 0.0472 | Test Acc: 100.00%
+Epoch [150/150] | Train Loss: 0.0057 | Train Acc: 100.00% | Test Loss: 0.0456 | Test Acc: 100.00%
+Stage 2: reps 0, 1, 2 | Train samples: 153 | Test samples: 39
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 0.0053 | Train Acc: 100.00% | Test Loss: 0.3215 | Test Acc: 97.44%
+Epoch [875/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.0769 | Test Acc: 94.87%
+Epoch [1750/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.4893 | Test Acc: 92.31%
+Epoch [2625/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.4754 | Test Acc: 94.87%
+Epoch [3500/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.6097 | Test Acc: 94.87%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 153 | Test samples: 39
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.6103 | Test Acc: 94.87%
+Epoch [1875/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.8483 | Test Acc: 94.87%
+Epoch [3750/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.9059 | Test Acc: 94.87%
+Epoch [5625/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.9394 | Test Acc: 94.87%
+Epoch [7500/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 1.9632 | Test Acc: 94.87%
+
+Done Training.
+
+==================================================
+TRAINING: all 0,1 reps except still/jerked cases
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 144
+Train split size: 114
+Test split size: 30
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 114 | Test samples: 30
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.3152 | Train Acc: 36.84% | Test Loss: 1.3092 | Test Acc: 50.00%
+Epoch [ 37/150] | Train Loss: 0.6758 | Train Acc: 52.63% | Test Loss: 0.7196 | Test Acc: 53.33%
+Epoch [ 74/150] | Train Loss: 0.2786 | Train Acc: 97.37% | Test Loss: 0.2474 | Test Acc: 96.67%
+Epoch [111/150] | Train Loss: 0.0745 | Train Acc: 98.25% | Test Loss: 0.0312 | Test Acc: 100.00%
+Epoch [148/150] | Train Loss: 0.0356 | Train Acc: 99.12% | Test Loss: 0.0229 | Test Acc: 100.00%
+Epoch [150/150] | Train Loss: 0.0180 | Train Acc: 100.00% | Test Loss: 0.0223 | Test Acc: 100.00%
+Stage 2: reps 0, 1, 2 | Train samples: 114 | Test samples: 30
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 0.0154 | Train Acc: 100.00% | Test Loss: 0.0170 | Test Acc: 100.00%
+Epoch [875/3500] | Train Loss: 0.0002 | Train Acc: 100.00% | Test Loss: 0.0004 | Test Acc: 100.00%
+Epoch [1750/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.0000 | Test Acc: 100.00%
+Epoch [2625/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.0000 | Test Acc: 100.00%
+Epoch [3500/3500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.0000 | Test Acc: 100.00%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 114 | Test samples: 30
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.0000 | Test Acc: 100.00%
+Epoch [1875/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.0000 | Test Acc: 100.00%
+Epoch [3750/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.6961 | Test Acc: 96.67%
+Epoch [5625/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 0.3305 | Test Acc: 96.67%
+Epoch [7500/7500] | Train Loss: 0.0017 | Train Acc: 100.00% | Test Loss: 0.0017 | Test Acc: 100.00%
+
+Done Training.
+
+==================================================
+TRAINING: only mine
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 176
+Train split size: 139
+Test split size: 37
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 89 | Test samples: 23
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.2425 | Train Acc: 66.29% | Test Loss: 1.2222 | Test Acc: 60.87%
+Epoch [ 37/150] | Train Loss: 0.5480 | Train Acc: 74.16% | Test Loss: 0.7357 | Test Acc: 60.87%
+Epoch [ 74/150] | Train Loss: 0.4436 | Train Acc: 79.78% | Test Loss: 0.8290 | Test Acc: 56.52%
+Epoch [111/150] | Train Loss: 0.3426 | Train Acc: 85.39% | Test Loss: 0.8187 | Test Acc: 60.87%
+Epoch [148/150] | Train Loss: 0.3169 | Train Acc: 86.52% | Test Loss: 0.7483 | Test Acc: 60.87%
+Epoch [150/150] | Train Loss: 0.3123 | Train Acc: 87.64% | Test Loss: 0.7824 | Test Acc: 60.87%
+Stage 2: reps 0, 1, 2 | Train samples: 114 | Test samples: 30
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 1.6096 | Train Acc: 69.30% | Test Loss: 2.0273 | Test Acc: 50.00%
+Epoch [875/3500] | Train Loss: 0.0656 | Train Acc: 98.25% | Test Loss: 2.8138 | Test Acc: 53.33%
+Epoch [1750/3500] | Train Loss: 0.4745 | Train Acc: 85.09% | Test Loss: 2.6833 | Test Acc: 53.33%
+Epoch [2625/3500] | Train Loss: 0.1324 | Train Acc: 93.86% | Test Loss: 1.8131 | Test Acc: 53.33%
+Epoch [3500/3500] | Train Loss: 0.0339 | Train Acc: 100.00% | Test Loss: 2.5591 | Test Acc: 56.67%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 139 | Test samples: 37
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 2.6604 | Train Acc: 82.01% | Test Loss: 7.9827 | Test Acc: 43.24%
+Epoch [1875/7500] | Train Loss: 0.1875 | Train Acc: 94.24% | Test Loss: 2.7724 | Test Acc: 48.65%
+Epoch [3750/7500] | Train Loss: 0.1663 | Train Acc: 97.84% | Test Loss: 3.0521 | Test Acc: 45.95%
+Epoch [5625/7500] | Train Loss: 0.0854 | Train Acc: 99.28% | Test Loss: 3.3908 | Test Acc: 51.35%
+Epoch [7500/7500] | Train Loss: 0.2384 | Train Acc: 92.09% | Test Loss: 3.2740 | Test Acc: 51.35%
+
+Done Training.
+
+==================================================
+TRAINING: only mine except still/jerked cases
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 128
+Train split size: 100
+Test split size: 28
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 50 | Test samples: 14
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.4185 | Train Acc: 30.00% | Test Loss: 1.5109 | Test Acc:  7.14%
+Epoch [ 37/150] | Train Loss: 0.6906 | Train Acc: 70.00% | Test Loss: 0.8771 | Test Acc: 28.57%
+Epoch [ 74/150] | Train Loss: 0.6203 | Train Acc: 72.00% | Test Loss: 0.9001 | Test Acc: 42.86%
+Epoch [111/150] | Train Loss: 0.4548 | Train Acc: 78.00% | Test Loss: 0.8856 | Test Acc: 57.14%
+Epoch [148/150] | Train Loss: 0.4467 | Train Acc: 84.00% | Test Loss: 0.8916 | Test Acc: 57.14%
+Epoch [150/150] | Train Loss: 0.5209 | Train Acc: 78.00% | Test Loss: 0.8791 | Test Acc: 57.14%
+Stage 2: reps 0, 1, 2 | Train samples: 75 | Test samples: 21
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 2.4307 | Train Acc: 56.00% | Test Loss: 2.6695 | Test Acc: 33.33%
+Epoch [875/3500] | Train Loss: 0.1523 | Train Acc: 96.00% | Test Loss: 1.9906 | Test Acc: 42.86%
+Epoch [1750/3500] | Train Loss: 0.1425 | Train Acc: 94.67% | Test Loss: 3.0696 | Test Acc: 52.38%
+Epoch [2625/3500] | Train Loss: 0.0028 | Train Acc: 100.00% | Test Loss: 3.6723 | Test Acc: 57.14%
+Epoch [3500/3500] | Train Loss: 0.0020 | Train Acc: 100.00% | Test Loss: 3.9590 | Test Acc: 47.62%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 100 | Test samples: 28
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 3.4669 | Train Acc: 75.00% | Test Loss: 6.0390 | Test Acc: 35.71%
+Epoch [1875/7500] | Train Loss: 0.2123 | Train Acc: 94.00% | Test Loss: 3.3425 | Test Acc: 25.00%
+Epoch [3750/7500] | Train Loss: 0.0511 | Train Acc: 99.00% | Test Loss: 3.9195 | Test Acc: 39.29%
+Epoch [5625/7500] | Train Loss: 0.0227 | Train Acc: 99.00% | Test Loss: 4.8345 | Test Acc: 35.71%
+Epoch [7500/7500] | Train Loss: 0.0014 | Train Acc: 100.00% | Test Loss: 5.5330 | Test Acc: 32.14%
+
+Done Training.
+
+==================================================
+TRAINING: only my 0,1 reps
+==================================================
+Using device: cuda
+Loading dataset from: /content/ESP32-C3 IMU/Python Files/recordings/training1
+Total labeled sequences loaded: 64
+Train split size: 50
+Test split size: 14
+
+Starting Curriculum Training...
+--------------------------------------------------
+Stage 1: reps 0, 1 | Train samples: 50 | Test samples: 14
+
+Stage 1: reps 0, 1
+------------------
+Epoch [  1/150] | Train Loss: 1.3673 | Train Acc: 26.00% | Test Loss: 1.2813 | Test Acc: 57.14%
+Epoch [ 37/150] | Train Loss: 0.6715 | Train Acc: 66.00% | Test Loss: 0.7025 | Test Acc: 50.00%
+Epoch [ 74/150] | Train Loss: 0.6071 | Train Acc: 76.00% | Test Loss: 0.7009 | Test Acc: 64.29%
+Epoch [111/150] | Train Loss: 0.4953 | Train Acc: 80.00% | Test Loss: 0.6763 | Test Acc: 71.43%
+Epoch [148/150] | Train Loss: 0.4795 | Train Acc: 80.00% | Test Loss: 0.6908 | Test Acc: 71.43%
+Epoch [150/150] | Train Loss: 0.4697 | Train Acc: 80.00% | Test Loss: 0.7026 | Test Acc: 71.43%
+Stage 2: reps 0, 1, 2 | Train samples: 50 | Test samples: 14
+
+Stage 2: reps 0, 1, 2
+---------------------
+Epoch [  1/3500] | Train Loss: 0.4279 | Train Acc: 82.00% | Test Loss: 0.6897 | Test Acc: 71.43%
+Epoch [875/3500] | Train Loss: 0.0553 | Train Acc: 98.00% | Test Loss: 2.1358 | Test Acc: 64.29%
+Epoch [1750/3500] | Train Loss: 0.0058 | Train Acc: 100.00% | Test Loss: 3.0585 | Test Acc: 50.00%
+Epoch [2625/3500] | Train Loss: 0.0010 | Train Acc: 100.00% | Test Loss: 3.7547 | Test Acc: 50.00%
+Epoch [3500/3500] | Train Loss: 0.0004 | Train Acc: 100.00% | Test Loss: 4.2737 | Test Acc: 50.00%
+Stage 3: reps 0, 1, 2, 3 | Train samples: 50 | Test samples: 14
+
+Stage 3: reps 0, 1, 2, 3
+------------------------
+Epoch [  1/7500] | Train Loss: 0.0004 | Train Acc: 100.00% | Test Loss: 4.2750 | Test Acc: 50.00%
+Epoch [1875/7500] | Train Loss: 0.0001 | Train Acc: 100.00% | Test Loss: 5.0788 | Test Acc: 50.00%
+Epoch [3750/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 5.7777 | Test Acc: 50.00%
+Epoch [5625/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 6.3954 | Test Acc: 50.00%
+Epoch [7500/7500] | Train Loss: 0.0000 | Train Acc: 100.00% | Test Loss: 7.1176 | Test Acc: 57.14%
+
+Done Training.
+<module 'WorkUp_Scheduler' from '/content/WorkUp_Scheduler.py'>
